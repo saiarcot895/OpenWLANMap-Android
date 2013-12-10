@@ -65,7 +65,7 @@ class UploadThread extends Thread {
         tagName = SP.getString("tag", "");
         teamid = SP.getString("team", "");
         if (SP.getBoolean("publish", false)) mainFlags = 1;
-        if (SP.getBoolean("pubmap", false)) mainFlags | = 2;
+        if (SP.getBoolean("pubmap", false)) mainFlags |= 2;
 
         try {
             in = new DataInputStream(ctx.openFileInput(FILE_UPLOADSTORE));
@@ -116,13 +116,13 @@ class UploadThread extends Thread {
                 txt = ctx.getResources().getText(R.string.app_name) + ": " + ctx.getResources().getText(R.string.preparing_data);
                 OWMiniAtAndroid.sendMessage(ScannerHandler.MSG_TOAST, 0, 0, txt);
             }
-            while (in.available() > = 28) {
+            while (in.available() >= 28) {
                 in.read(data, 0, 12);
                 bssid = new String(data);
                 lat = in.readDouble();
                 lon = in.readDouble();
-                if ((lat > = -90.0) && (lat < = 90.0) &&
-                        (lon > = -180.0) && (lon < = 180.0)) {
+                if ((lat >= -90.0) && (lat <= 90.0) &&
+                        (lon >= -180.0) && (lon <= 180.0)) {
                     foundEntry = false;
                     currEntry = uploadMap.get(bssid);
                     if (currEntry != null) {
@@ -169,7 +169,7 @@ class UploadThread extends Thread {
             ScanService.scanData.lock.lock();
             openMap = new HashMap<String, String>();
             try {
-                while (openIn.available() > = 12) {
+                while (openIn.available() >= 12) {
                     openIn.read(data, 0, 12);
                     bssid = new String(data);
                     openMap.put(bssid, bssid);

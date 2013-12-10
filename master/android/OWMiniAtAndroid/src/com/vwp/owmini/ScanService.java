@@ -84,8 +84,8 @@ public class ScanService extends Service implements Runnable {
         notification = new Notification(R.drawable.icon, getResources().getText(R.string.app_name).toString(), System.currentTimeMillis());
         notification.setLatestEventInfo(this, getResources().getText(R.string.app_name).toString(), "", pendIntent);
 
-        notification.flags | = Notification.FLAG_NO_CLEAR;
-        notification.flags | = Notification.FLAG_ONGOING_EVENT;
+        notification.flags |= Notification.FLAG_NO_CLEAR;
+        notification.flags |= Notification.FLAG_ONGOING_EVENT;
         startForeground(1703, notification);
 
         scanData.service = this;
@@ -380,8 +380,8 @@ public class ScanService extends Service implements Runnable {
                                             (lowerSSID.contains("guest@ms ")) ||   // WLAN network on Hurtigruten ships
                                             (lowerSSID.contains("admin@ms ")) ||   // WLAN network on Hurtigruten ships
                                             (lowerSSID.contains("nsb_interakti"))) // WLAN network in NSB trains
-                                        currEntry.flags | = WMapEntry.FLAG_IS_NOMAP;
-                                    else currEntry.flags | = isFreeHotspot(result);
+                                        currEntry.flags |= WMapEntry.FLAG_IS_NOMAP;
+                                    else currEntry.flags |= isFreeHotspot(result);
                                     if (isFreeHotspot(currEntry.flags))
                                         scanData.incFreeHotspotWLANs();
                                     scanData.wmapList.add(currEntry);

@@ -25,8 +25,8 @@ public class WMapSlimEntry {
             this.lon = 0.0;
             return;
         }
-        this.lat + = lat;
-        this.lon + = lon;
+        this.lat += lat;
+        this.lon += lon;
     }
 
 

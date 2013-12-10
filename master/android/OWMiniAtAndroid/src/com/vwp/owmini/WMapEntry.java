@@ -38,7 +38,7 @@ public class WMapEntry {
         lastLon = lon;
         addAvgPos(lat, lon);
         lastUpdate = System.currentTimeMillis();
-        flags | = FLAG_POS_CHANGED;
+        flags |= FLAG_POS_CHANGED;
     }
 //--.
 
@@ -106,7 +106,7 @@ public class WMapEntry {
             latView.setTextColor(0xFFAAAAFF);
             lonView.setTextColor(0xFFAAAAFF);
         }
-        flags | = FLAG_UI_USED;
+        flags |= FLAG_UI_USED;
     }
 
 
@@ -135,8 +135,8 @@ public class WMapEntry {
 
     private void addAvgPos(double lat, double lon) {
         avgCtr++;
-        avgLat + = lat;
-        avgLon + = lon;
+        avgLat += lat;
+        avgLon += lon;
     }
 
     public void setPos(double lat, double lon) {
@@ -144,7 +144,7 @@ public class WMapEntry {
         lastLon = lon;
         addAvgPos(lat, lon);
         lastUpdate = System.currentTimeMillis();
-        flags | = FLAG_POS_CHANGED;
+        flags |= FLAG_POS_CHANGED;
     }
 
 
