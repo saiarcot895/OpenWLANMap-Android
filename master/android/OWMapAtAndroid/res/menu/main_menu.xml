@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/exit"
+        android:title="@string/exit"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"/>
+    <item
+        android:id="@+id/upload_data"
+        android:title="@string/upload_data"
+        android:icon="@android:drawable/ic_menu_upload"/>
+    <item
+        android:id="@+id/show_map"
+        android:title="@string/show_map"
+        android:icon="@android:drawable/ic_menu_mapmode"/>
+    <item
+        android:id="@+id/freehotspot"
+        android:title="@string/freehotspot"
+        android:icon="@android:drawable/ic_menu_search"/>
+    <item
+        android:id="@+id/prefs"
+        android:title="@string/prefs"
+        android:icon="@android:drawable/ic_menu_preferences"/>
+    <item
+        android:id="@+id/teamid"
+        android:title="@string/teamid"
+        android:icon="@android:drawable/ic_menu_share"/>
+    <item
+        android:id="@+id/calib_tele"
+        android:title="@string/calib_tele"
+        android:icon="@android:drawable/ic_menu_directions"/>
+    <item
+        android:id="@+id/calib_orient"
+        android:title="@string/calib_orient"
+        android:icon="@android:drawable/ic_menu_directions"/>
+    <item
+        android:id="@+id/help"
+        android:title="@string/help"
+        android:icon="@android:drawable/ic_menu_help"/>
+    <item
+        android:id="@+id/credits"
+        android:title="@string/credits"
+        android:icon="@android:drawable/ic_menu_info_details"/>
+</menu>
