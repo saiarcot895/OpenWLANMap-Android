@@ -132,7 +132,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
     }
 
 
-    static class ScannerHandler extends Handler {
+    private static class ScannerHandler extends Handler {
         public static final int MSG_ADD_ENTRY = 1;
         public static final int MSG_REM_ENTRY = 2;
         public static final int MSG_UPD_POS = 3;
@@ -481,8 +481,6 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
 
     private void createUI() {
-        this.setTitle(getResources().getText(R.string.app_name).toString());
-
         scannerHandler.rootLayout = (FrameLayout) findViewById(R.id.rootLayout);
         scannerHandler.parentTable = (TableLayout) findViewById(R.id.currListTableLayout);
         scannerHandler.mapTable = (TableLayout) findViewById(R.id.mapTableLayout);
@@ -581,10 +579,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
             getIntent().putExtra("autostarted", false);
         }
 
-        try {
-            textSizeVal = Integer.parseInt(SP.getString("textSize", "1"));
-        } catch (NumberFormatException nfe) {
-        }
+        textSizeVal = Integer.parseInt(SP.getString("textSize", "1"));
 
         super.onCreate(savedInstanceState);
         pm = (PowerManager) getSystemService(POWER_SERVICE);
@@ -614,11 +609,8 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
     private void getTelemetryConfig(SharedPreferences SP) {
         String txt = SP.getString("telemetry", "1");
-        if ((txt.equalsIgnoreCase("2")) || (txt.equalsIgnoreCase("4"))) showTele = true;
-        else showTele = false;
-        if ((txt.equalsIgnoreCase("3")) || (txt.equalsIgnoreCase("4")))
-            ScanService.scanData.storeTele = true;
-        else ScanService.scanData.storeTele = false;
+        showTele = (txt.equalsIgnoreCase("2")) || (txt.equalsIgnoreCase("4"));
+        ScanService.scanData.storeTele = (txt.equalsIgnoreCase("3")) || (txt.equalsIgnoreCase("4"));
     }
 
 
@@ -657,6 +649,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
     }
 
 
+    @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.exit:
@@ -759,7 +752,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
     }
 
 
-    protected void updateRank() {
+    private void updateRank() {
         if (ScanService.scanData.uploadedRank > 0) {
             rankText.setText(ctx.getResources().getText(R.string.rank) + ": " + ScanService.scanData.uploadedRank + " (" + ScanService.scanData.uploadedCount + " " + ctx.getResources().getText(R.string.points).toString() + ")");
 //         ctx.mapButton.setEnabled(true);
