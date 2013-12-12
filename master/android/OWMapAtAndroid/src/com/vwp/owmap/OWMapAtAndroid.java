@@ -132,7 +132,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
     }
 
 
-    private static class ScannerHandler extends Handler {
+    static class ScannerHandler extends Handler {
         public static final int MSG_ADD_ENTRY = 1;
         public static final int MSG_REM_ENTRY = 2;
         public static final int MSG_UPD_POS = 3;
