@@ -341,6 +341,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                         liveMapView.updateViewTiles(ScanService.scanData.getLat(), ScanService.scanData.getLon());
                         if (!showTele) liveMapView.invalidate();
                     }
+                    liveMapView.setVisibility(showMap ? View.VISIBLE : View.INVISIBLE);
                     break;
                 case MSG_ADD_ENTRY: {
                     WMapEntry entry;
@@ -484,32 +485,14 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         scannerHandler.rootLayout = (FrameLayout) findViewById(R.id.rootLayout);
         scannerHandler.parentTable = (TableLayout) findViewById(R.id.currListTableLayout);
         scannerHandler.mapTable = (TableLayout) findViewById(R.id.mapTableLayout);
+        scannerHandler.latTableText = (TextView) findViewById(R.id.latTableText);
+        scannerHandler.lonTableText = (TextView) findViewById(R.id.lonTableText);
 
-        TableRow row = new TableRow(this);
-        TextView text = new TextView(this);
-        setTextStyle(ctx, text);
-        text.setText("    ");
-        row.addView(text);
-
-        text = new TextView(this);
-        setTextStyle(ctx, text);
-        text.setText("    ");
-        row.addView(text);
-
-        text = new TextView(this);
-        setTextStyle(ctx, text);
-        text.setText(getResources().getText(R.string.bssid));
-        row.addView(text);
-
-        scannerHandler.latTableText = new TextView(this);
+        setTextStyle(ctx, (TextView) findViewById(R.id.textView1));
+        setTextStyle(ctx, (TextView) findViewById(R.id.textView2));
+        setTextStyle(ctx, (TextView) findViewById(R.id.textView3));
         setTextStyle(ctx, scannerHandler.latTableText);
-        row.addView(scannerHandler.latTableText, new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
-
-        scannerHandler.lonTableText = new TextView(this);
         setTextStyle(ctx, scannerHandler.lonTableText);
-        row.addView(scannerHandler.lonTableText, new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
-
-        scannerHandler.parentTable.addView(row, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.FILL_PARENT));
 
         mapTableRow = (TableRow) findViewById(R.id.mapTableRow);
         scannerHandler.liveMapView = new LiveMapView(this);
