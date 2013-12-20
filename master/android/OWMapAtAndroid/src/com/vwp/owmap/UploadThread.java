@@ -59,11 +59,10 @@ class UploadThread extends Thread {
         byte data[] = new byte[12];
         boolean foundEntry, scanningEnabled;
         int mainFlags = 0, cnt;
-        String tagName = "", teamid = "";
 
         System.gc();
-        tagName = SP.getString("tag", "");
-        teamid = SP.getString("team", "");
+        String tagName = SP.getString("tag", "");
+        String teamid = SP.getString("team", "");
         if (SP.getBoolean("publish", false)) mainFlags = 1;
         if (SP.getBoolean("pubmap", false)) mainFlags |= 2;
 
@@ -146,7 +145,7 @@ class UploadThread extends Thread {
         outString = outString + "T\t" + tagName + "\n";
 
         if (teamid.length() > 0) {
-            StringBuffer s = new StringBuffer(teamid);
+            StringBuilder s = new StringBuilder(teamid);
             s.reverse();
             outString = outString + "E\t" + s + "\n";
         }

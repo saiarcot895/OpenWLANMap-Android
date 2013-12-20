@@ -117,8 +117,7 @@ public class TotalMap extends MapOverlay {
                 return false;
             }
         }
-        if (coordList.size() < 5) return false;
-        return true;
+        return coordList.size() >= 5;
     }
 
     private void loadMap(String BSSID) {

@@ -54,9 +54,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
     private OWMapAtAndroid ctx;
     static boolean showMap = false, showTele = false, doTrack = true, hasPosLock = false;
     private TextView rankText;
-    private TableRow mapTableRow;
     ScannerHandler scannerHandler = null;
-    private PowerManager pm = null;
     private PowerManager.WakeLock wl = null;
     private Vector<WMapSlimEntry> freeHotspotList;
     private ListView ffLv;
@@ -158,7 +156,8 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         LiveMapView liveMapView;
         ProgressDialog progDlg;
         MapView mapView;
-        boolean bigCounter = false, lastShowMap = true, lastShowTele = true;//!showMap;
+        boolean bigCounter = false;
+        boolean lastShowMap = true;
         OWMapAtAndroid owmp;
         private TotalMap mapOverlay;
         FrameLayout rootLayout;
@@ -494,7 +493,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         setTextStyle(ctx, scannerHandler.latTableText);
         setTextStyle(ctx, scannerHandler.lonTableText);
 
-        mapTableRow = (TableRow) findViewById(R.id.mapTableRow);
+        TableRow mapTableRow = (TableRow) findViewById(R.id.mapTableRow);
         scannerHandler.liveMapView = new LiveMapView(this);
         mapTableRow.addView(scannerHandler.liveMapView);//,new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
@@ -565,7 +564,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         textSizeVal = Integer.parseInt(SP.getString("textSize", "1"));
 
         super.onCreate(savedInstanceState);
-        pm = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "OpenWLANMapMain");
         scannerHandler = new ScannerHandler();
         scannerHandler.owmp = this;
@@ -586,7 +585,6 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         showMap = SP.getBoolean("showMap", false);
         scannerHandler.lastShowMap = !showMap;
         getTelemetryConfig(SP);
-        scannerHandler.lastShowTele = !showTele;
     }
 
 
@@ -666,7 +664,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                 text = getResources().getText(R.string.teamtext).toString();
                 text = text + "\n";
 
-                StringBuffer s = new StringBuffer(ScanService.scanData.ownBSSID);
+                StringBuilder s = new StringBuilder(ScanService.scanData.ownBSSID);
                 s.reverse();
                 text = text + s;
 

@@ -22,7 +22,6 @@ public class LiveMapView extends View implements Runnable {
     private double m_lat, m_lon;
     private Paint wlanColour, instColour, instInner, instInner2, teleBG, posColour;
     public final int m_zoom = 17;
-    private Thread tilesThread;
     private boolean allowThread = false;
     private LiveMapData[] mapData = new LiveMapData[2];
     private int currMap = 0;
@@ -155,7 +154,7 @@ public class LiveMapView extends View implements Runnable {
             mapData[1 - currMap].m_tileX = nextTileX;
             mapData[1 - currMap].m_tileY = nextTileY;
             allowThread = true;
-            tilesThread = new Thread(this);
+            Thread tilesThread = new Thread(this);
             tilesThread.start();
         }
     }
