@@ -51,7 +51,7 @@ public class TotalMap extends MapOverlay {
         EarthCoord coord;
         HttpURLConnection c = null;
         DataOutputStream os = null;
-        DataInputStream is = null;
+        BufferedReader is = null;
         int rc;
 
         outString = ownBSSID.replace(":", "").replace(".", "");
@@ -78,10 +78,10 @@ public class TotalMap extends MapOverlay {
                 OWMapAtAndroid.sendMessage(OWMapAtAndroid.ScannerHandler.MSG_SIMPLE_ALERT, 0, 0, ctx.getResources().getString(R.string.http_error) + " " + rc);
                 return false;
             }
-            is = new DataInputStream(new BufferedInputStream(c.getInputStream()));
+            is = new BufferedReader(new InputStreamReader(c.getInputStream()));
             out = new DataOutputStream(ctx.openFileOutput(OWMapAtAndroid.MAP_DATA_FILE, Context.MODE_PRIVATE));
             try {
-                while (is.available() > 0) {
+                while (is.ready()) {
                     inString = is.readLine();
                     lat = Integer.parseInt(inString) / 1000000.0f;
                     inString = is.readLine();

@@ -221,7 +221,7 @@ class UploadThread extends Thread {
     private boolean uploadData(String outString, boolean silent) {
         HttpURLConnection c = null;
         BufferedOutputStream os = null;
-        DataInputStream is = null;
+        BufferedReader is = null;
         int rc, remoteVersion = 0;
         String inString;
         int newAPs = 0, updAPs = 0, delAPs = 0, newPoints = 0;
@@ -254,7 +254,7 @@ class UploadThread extends Thread {
                     OWMapAtAndroid.sendMessage(ScannerHandler.MSG_SIMPLE_ALERT, 0, 0, ctx.getResources().getString(R.string.http_error) + " " + rc);
                 return false;
             }
-            is = new DataInputStream(c.getInputStream());
+            is = new BufferedReader(new InputStreamReader(c.getInputStream()));
             try {
                 inString = is.readLine();
                 remoteVersion = Integer.parseInt(inString);

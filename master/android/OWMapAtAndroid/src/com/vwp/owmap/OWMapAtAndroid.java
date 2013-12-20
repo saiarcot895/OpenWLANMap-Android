@@ -55,7 +55,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
     static boolean showMap = false, showTele = false, doTrack = true, hasPosLock = false;
     private TextView rankText;
     ScannerHandler scannerHandler = null;
-    private PowerManager.WakeLock wl = null;
+    //private PowerManager.WakeLock wl = null;
     private Vector<WMapSlimEntry> freeHotspotList;
     private ListView ffLv;
 
@@ -74,14 +74,14 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
             else ad.setMessage("missing ressource!");
             if (title != null) ad.setTitle(title);
             if (mode == ALERT_OK) {
-                ad.setButton(ctx.getResources().getText(R.string.ok), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_POSITIVE, ctx.getResources().getText(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
             } else if (mode == ALERT_GPSWARN) {
-                ad.setButton(ctx.getResources().getText(R.string.ok), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_POSITIVE, ctx.getResources().getText(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -90,7 +90,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                     }
                 });
             } else if (mode == ALERT_NO_EXIT) {
-                ad.setButton(ctx.getResources().getText(R.string.exit), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_POSITIVE, ctx.getResources().getText(R.string.exit), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ScanService.running = false;
@@ -100,14 +100,14 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                         //                 System.exit(0);
                     }
                 });
-                ad.setButton2(ctx.getResources().getText(R.string.no), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_NEGATIVE, ctx.getResources().getText(R.string.no), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
             } else if (mode == ALERT_SHOW_MAP) {
-                ad.setButton(ctx.getResources().getText(R.string.yes), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_POSITIVE, ctx.getResources().getText(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         OWMapAtAndroid.sendMessage(OWMapAtAndroid.ScannerHandler.MSG_OPEN_PRG_DLG, 0, 0, ctx.getResources().getText(R.string.loading_map).toString());
@@ -115,7 +115,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                         dialog.dismiss();
                     }
                 });
-                ad.setButton2(ctx.getResources().getText(R.string.no), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_NEGATIVE, ctx.getResources().getText(R.string.no), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -244,7 +244,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                 String outString;
                 HttpURLConnection c = null;
                 DataOutputStream os = null;
-                DataInputStream is = null;
+                BufferedReader is = null;
 
                 outString = ScanService.scanData.getLat() + "\n" + ScanService.scanData.getLon() + "\n";
                 try {
@@ -263,12 +263,12 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                     os.flush();
                     c.getResponseCode();
                     os.close();
-                    is = new DataInputStream(c.getInputStream());
+                    is = new BufferedReader(new InputStreamReader(c.getInputStream()));
                     outString = is.readLine();
                     owmp.freeHotspotList = new Vector<WMapSlimEntry>();
                     if (outString.equalsIgnoreCase("0")) {
                         try {
-                            while (is.available() > 0) {
+                            while (is.ready()) {
                                 WMapSlimEntry entry = new WMapSlimEntry(is.readLine(), is.readLine());
                                 owmp.freeHotspotList.add(entry);
                             }
@@ -349,7 +349,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                     entry = (WMapEntry) msg.obj;
                     if ((entry.flags & WMapEntry.FLAG_UI_USED) == 0) entry.createUIData(owmp);
                     if ((entry.flags & WMapEntry.FLAG_IS_VISIBLE) == 0) {
-                        parentTable.addView(entry.row, 1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.FILL_PARENT));
+                        parentTable.addView(entry.row, 1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
                         entry.flags |= WMapEntry.FLAG_IS_VISIBLE;
                     }
                     lock.unlock();
@@ -564,8 +564,6 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         textSizeVal = Integer.parseInt(SP.getString("textSize", "1"));
 
         super.onCreate(savedInstanceState);
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "OpenWLANMapMain");
         scannerHandler = new ScannerHandler();
         scannerHandler.owmp = this;
         setContentView(R.layout.main);
@@ -907,7 +905,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 //      else initView();
 
 //       mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        if (wl != null) wl.acquire();
+        //if (wl != null) wl.acquire();
     }
 
 
@@ -915,7 +913,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         WMapEntry currEntry;
         int j;
 
-        if (wl != null) wl.release();
+        //if (wl != null) wl.release();
         ScanService.scanData.isActive = false; // try to stop the thread
         if (ScanService.scanData.viewMode == VIEW_MODE_MAP) onBackPressed();
 //       mSensorManager.unregisterListener(this);

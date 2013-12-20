@@ -91,8 +91,12 @@ public class ScanService extends Service implements Runnable, SensorEventListene
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        notification = new Notification(R.drawable.icon, getResources().getText(R.string.app_name).toString(), System.currentTimeMillis());
-        notification.setLatestEventInfo(this, getResources().getText(R.string.app_name).toString(), "", pendIntent);
+        notification = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.icon)
+                .setContentTitle(getResources().getText(R.string.app_name))
+                .setContentText("")
+                .setContentIntent(pendIntent)
+                .build();
 
         notification.flags |= Notification.FLAG_NO_CLEAR;
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
@@ -115,7 +119,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_GAME);
         sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        mSensor = (Sensor) sensors.get(0);
+        mSensor = sensors.get(0);
         scanData.telemetryData.setAccelMax(mSensor.getMaximumRange());
         telemetryDir = Environment.getExternalStorageDirectory().getPath() + "/telemetry/";
         File dir = new File(telemetryDir);

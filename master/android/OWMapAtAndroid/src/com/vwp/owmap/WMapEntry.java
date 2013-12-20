@@ -48,7 +48,7 @@ public class WMapEntry {
 
         TableLayout.LayoutParams tableRowParams =
                 new TableLayout.LayoutParams
-                        (TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+                        (TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
 
         tableRowParams.setMargins(2, 2, 18, 2);
 
