@@ -175,13 +175,13 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
         private void dbgUpdLocState(Message msg) {
             if (msg.arg1 < 0)
-                locStateText.setText(ScanService.scanData.ctx.getResources().getText(R.string.waitGPS) + " ");
+                locStateText.setText(ScanService.getScanData().ctx.getResources().getText(R.string.waitGPS) + " ");
             else {
                 String locText = "";
                 loc_info locationInfo;
 
                 if ((msg.arg1 > OWMapAtAndroid.MAX_RADIUS * 1000) || (msg.arg2 == loc_info.LOC_METHOD_NONE)) {
-                    locText = ScanService.scanData.ctx.getResources().getText(R.string.waitGPS) + " ";
+                    locText = ScanService.getScanData().ctx.getResources().getText(R.string.waitGPS) + " ";
                     hasPosLock = false;
                 } else hasPosLock = true;
                 locationInfo = (loc_info) msg.obj;
@@ -204,7 +204,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
 
         private void dbgUpdApCount(Message msg) {
-            apCountText.setText(ScanService.scanData.ctx.getResources().getText(R.string.ap_count).toString() + ": " + msg.arg1); //pj   q6uikcde
+            apCountText.setText(ScanService.getScanData().ctx.getResources().getText(R.string.ap_count).toString() + ": " + msg.arg1); //pj   q6uikcde
             if (bigCounter) {
                 bigCntText.setText("" + msg.arg1);
                 bigOpenCntText.setText("" + msg.arg2);
@@ -212,8 +212,8 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                 bigCntText.setText("");
                 bigOpenCntText.setText("");
             }
-            if (ScanService.scanData.bigCntTextHud != null)
-                ScanService.scanData.bigCntTextHud.setText("" + msg.arg1);
+            if (ScanService.getScanData().bigCntTextHud != null)
+                ScanService.getScanData().bigCntTextHud.setText("" + msg.arg1);
         }
 
 
@@ -233,7 +233,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
         private class DownloadMapDataTask extends AsyncTask<Void, Void, Void> {
             protected Void doInBackground(Void... params) {
-                mapOverlay = new TotalMap(owmp, ScanService.scanData.ownBSSID);
+                mapOverlay = new TotalMap(owmp, ScanService.getScanData().ownBSSID);
                 owmp.scannerHandler.sendEmptyMessage(ScannerHandler.MSG_SHOW_MAP2);
                 return null;
             }
@@ -246,7 +246,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                 DataOutputStream os = null;
                 BufferedReader is = null;
 
-                outString = ScanService.scanData.getLat() + "\n" + ScanService.scanData.getLon() + "\n";
+                outString = ScanService.getScanData().getLat() + "\n" + ScanService.getScanData().getLon() + "\n";
                 try {
                     URL connectURL = new URL("http://www.openwlanmap.org/android/freifunk.php");
                     c = (HttpURLConnection) connectURL.openConnection();
@@ -298,7 +298,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
             super.handleMessage(msg);
 
-            if (!ScanService.scanData.isActive) return;
+            if (!ScanService.getScanData().isActive) return;
             switch (msg.what) {
                 case MSG_TOAST:
                     Toast.makeText(owmp, (String) msg.obj, Toast.LENGTH_SHORT).show();
@@ -322,7 +322,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                         for (int i = 0; i < owmp.freeHotspotList.size(); i++) {
                             WMapSlimEntry entry = owmp.freeHotspotList.elementAt(i);
 
-                            String text = "" + GeoUtils.latlon2dist(ScanService.scanData.getLat(), ScanService.scanData.getLon(), entry.lat, entry.lon);
+                            String text = "" + GeoUtils.latlon2dist(ScanService.getScanData().getLat(), ScanService.getScanData().getLon(), entry.lat, entry.lon);
                             text = text.substring(0, 8);
                             text = text + " km";
                             adapter.add(text);
@@ -330,14 +330,14 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                         owmp.ffLv.setAdapter(adapter);
                         owmp.ffLv.setOnItemClickListener(owmp);
                         owmp.scannerHandler.rootLayout.addView(owmp.ffLv);
-                        ScanService.scanData.viewMode = VIEW_MODE_FF_LIST;
+                        ScanService.getScanData().viewMode = VIEW_MODE_FF_LIST;
                     }
                     OWMapAtAndroid.sendMessage(OWMapAtAndroid.ScannerHandler.MSG_CLOSE_PRG_DLG, 0, 0, null);
                     break;
                 }
                 case MSG_UPD_LIVE_MAP:
                     if (showMap) {
-                        liveMapView.updateViewTiles(ScanService.scanData.getLat(), ScanService.scanData.getLon());
+                        liveMapView.updateViewTiles(ScanService.getScanData().getLat(), ScanService.getScanData().getLon());
                         if (!showTele) liveMapView.invalidate();
                     }
                     liveMapView.setVisibility(showMap ? View.VISIBLE : View.INVISIBLE);
@@ -431,7 +431,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                         mode = GeoUtils.MODE_OSM_NIGHT;
                     else mode = GeoUtils.MODE_GMAP;
 
-                    mapView = new MapView(owmp, ((ScanService.scanData.getFlags() & OWMapAtAndroid.FLAG_NO_NET_ACCESS) == 0), mode);
+                    mapView = new MapView(owmp, ((ScanService.getScanData().getFlags() & OWMapAtAndroid.FLAG_NO_NET_ACCESS) == 0), mode);
                     new DownloadMapDataTask().execute(null, null, null);
                     break;
                 }
@@ -439,9 +439,9 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                     mapView.setOverlay(mapOverlay);
                     rootLayout.addView(mapView);
 
-                    ScanService.scanData.viewMode = VIEW_MODE_MAP;
-                    ScanService.scanData.threadMode = THREAD_MODE_MAP;
-                    ScanService.scanData.watchThread.interrupt();
+                    ScanService.getScanData().viewMode = VIEW_MODE_MAP;
+                    ScanService.getScanData().threadMode = THREAD_MODE_MAP;
+                    ScanService.getScanData().watchThread.interrupt();
 
                     owmp.scannerHandler.sendEmptyMessage(OWMapAtAndroid.ScannerHandler.MSG_CLOSE_PRG_DLG);
                     break;
@@ -515,27 +515,27 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
     private void createService(Bundle savedInstanceState) {
         if ((savedInstanceState == null) || (!savedInstanceState.getBoolean("init")) /*|| (ScanService.scanData==null)*/) {
 //         ScanService.scanData=new ScanData(this);
-            ScanService.scanData.init(this);
+            ScanService.getScanData().init(this);
 //         ScanService.scanData.ctx=this;
             loadConfig();
             startService(new Intent(this, ScanService.class));
         }
-        if (ScanService.scanData.wifiManager == null) ScanService.scanData.init(this);
-        if ((ScanService.scanData.getFlags() & FLAG_NO_NET_ACCESS) != 0) {
+        if (ScanService.getScanData().wifiManager == null) ScanService.getScanData().init(this);
+        if ((ScanService.getScanData().getFlags() & FLAG_NO_NET_ACCESS) != 0) {
             noNetAccCB.setChecked(true);
-            ScanService.scanData.wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, "OpenWLANMap");
+            ScanService.getScanData().wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, "OpenWLANMap");
         } else {
-            ScanService.scanData.wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "OpenWLANMap");
+            ScanService.getScanData().wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "OpenWLANMap");
         }
-        ScanService.scanData.ctx = this;
+        ScanService.getScanData().ctx = this;
     }
 
 
     private void setupInitial() {
-        WifiInfo wifiInfo = ScanService.scanData.wifiManager.getConnectionInfo();
+        WifiInfo wifiInfo = ScanService.getScanData().wifiManager.getConnectionInfo();
         if ((wifiInfo != null) && (wifiInfo.getMacAddress() != null))
-            ScanService.scanData.ownBSSID = wifiInfo.getMacAddress().replace(":", "").replace(".", "").toUpperCase(Locale.US);
-        else ScanService.scanData.ownBSSID = "00DEADBEEF00";
+            ScanService.getScanData().ownBSSID = wifiInfo.getMacAddress().replace(":", "").replace(".", "").toUpperCase(Locale.US);
+        else ScanService.getScanData().ownBSSID = "00DEADBEEF00";
         updateRank();
     }
 
@@ -575,10 +575,10 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         createUI();
 
         createService(savedInstanceState);
-        ScanService.scanData.hudCounter = SP.getBoolean("hudCounter", false);
+        ScanService.getScanData().hudCounter = SP.getBoolean("hudCounter", false);
         setupInitial();
 
-        sendMessage(ScannerHandler.MSG_UPD_AP_COUNT, ScanService.scanData.getStoredValues(), ScanService.scanData.getFreeHotspotWLANs(), null);
+        sendMessage(ScannerHandler.MSG_UPD_AP_COUNT, ScanService.getScanData().getStoredValues(), ScanService.getScanData().getFreeHotspotWLANs(), null);
         if (sendToBack) moveTaskToBack(true);
         showMap = SP.getBoolean("showMap", false);
         scannerHandler.lastShowMap = !showMap;
@@ -589,7 +589,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
     private void getTelemetryConfig(SharedPreferences SP) {
         String txt = SP.getString("telemetry", "1");
         showTele = (txt.equalsIgnoreCase("2")) || (txt.equalsIgnoreCase("4"));
-        ScanService.scanData.storeTele = (txt.equalsIgnoreCase("3")) || (txt.equalsIgnoreCase("4"));
+        ScanService.getScanData().storeTele = (txt.equalsIgnoreCase("3")) || (txt.equalsIgnoreCase("4"));
     }
 
 
@@ -609,13 +609,13 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
         MenuItem prefsMenuItem;
 
-        if (ScanService.scanData.viewMode == VIEW_MODE_MAP) {
+        if (ScanService.getScanData().viewMode == VIEW_MODE_MAP) {
             prefsMenuItem = menu.findItem(R.id.show_map);
             prefsMenuItem.setIcon(android.R.drawable.ic_menu_save);
         }
 
         prefsMenuItem = menu.findItem(R.id.freehotspot);
-        prefsMenuItem.setEnabled(hasPosLock & ((ScanService.scanData.getFlags() & FLAG_NO_NET_ACCESS) == 0));
+        prefsMenuItem.setEnabled(hasPosLock & ((ScanService.getScanData().getFlags() & FLAG_NO_NET_ACCESS) == 0));
 
         if (scannerHandler.liveMapView.telemetryData == null) {
             prefsMenuItem = menu.findItem(R.id.calib_tele);
@@ -635,14 +635,14 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                 simpleAlert(getResources().getText(R.string.really_exit_app).toString(), null, ALERT_NO_EXIT);
                 break;
             case R.id.upload_data:
-                ScanService.scanData.threadMode = THREAD_MODE_UPLOAD;
+                ScanService.getScanData().threadMode = THREAD_MODE_UPLOAD;
                 break;
             case R.id.show_map:
-                if (ScanService.scanData.viewMode == VIEW_MODE_MAP) {
+                if (ScanService.getScanData().viewMode == VIEW_MODE_MAP) {
                     scannerHandler.mapOverlay.saveMap();
                     //onBackPressed();
                 } else {
-                    if ((ScanService.scanData.getFlags() & FLAG_NO_NET_ACCESS) == 0) {
+                    if ((ScanService.getScanData().getFlags() & FLAG_NO_NET_ACCESS) == 0) {
                         OWMapAtAndroid.sendMessage(OWMapAtAndroid.ScannerHandler.MSG_OPEN_PRG_DLG, 0, 0, ctx.getResources().getText(R.string.loading_map).toString());
                         scannerHandler.sendEmptyMessage(ScannerHandler.MSG_SHOW_MAP);
                     } else
@@ -662,7 +662,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                 text = getResources().getText(R.string.teamtext).toString();
                 text = text + "\n";
 
-                StringBuilder s = new StringBuilder(ScanService.scanData.ownBSSID);
+                StringBuilder s = new StringBuilder(ScanService.getScanData().ownBSSID);
                 s.reverse();
                 text = text + s;
 
@@ -670,18 +670,18 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                 break;
             case R.id.calib_tele:
                 if ((scannerHandler.liveMapView != null) && (scannerHandler.liveMapView.telemetryData != null)) {
-                    ScanService.scanData.telemetryData.corrAccel(scannerHandler.liveMapView.telemetryData.accelX,
+                    ScanService.getScanData().telemetryData.corrAccel(scannerHandler.liveMapView.telemetryData.accelX,
                             scannerHandler.liveMapView.telemetryData.accelY,
                             scannerHandler.liveMapView.telemetryData.accelZ);
-                    ScanService.scanData.telemetryData.corrOrient(scannerHandler.liveMapView.telemetryData.orientY,
+                    ScanService.getScanData().telemetryData.corrOrient(scannerHandler.liveMapView.telemetryData.orientY,
                             scannerHandler.liveMapView.telemetryData.orientZ);
-                    ScanService.scanData.service.storeConfig();
+                    ScanService.getScanData().service.storeConfig();
                 }
                 break;
             case R.id.calib_orient:
                 if ((scannerHandler.liveMapView != null) && (scannerHandler.liveMapView.telemetryData != null)) {
-                    ScanService.scanData.telemetryData.corrCoG(scannerHandler.liveMapView.telemetryData.CoG);
-                    ScanService.scanData.service.storeConfig();
+                    ScanService.getScanData().telemetryData.corrCoG(scannerHandler.liveMapView.telemetryData.CoG);
+                    ScanService.getScanData().service.storeConfig();
                 }
                 break;
             case R.id.help:
@@ -703,18 +703,18 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         try {
             in = new DataInputStream(ctx.openFileInput("wscnprefs"));
             in.readByte(); // version
-            ScanService.scanData.setFlags(in.readInt()); // operation flags;
-            ScanService.scanData.setStoredValues(in.readInt()); // number of currently stored values
-            ScanService.scanData.uploadedCount = in.readInt();
-            ScanService.scanData.uploadedRank = in.readInt();
+            ScanService.getScanData().setFlags(in.readInt()); // operation flags;
+            ScanService.getScanData().setStoredValues(in.readInt()); // number of currently stored values
+            ScanService.getScanData().uploadedCount = in.readInt();
+            ScanService.getScanData().uploadedRank = in.readInt();
             in.readInt(); // open WLANS, no longer used
-            ScanService.scanData.setFreeHotspotWLANs(in.readInt());
-            ScanService.scanData.telemetryData.corrAccelX = in.readFloat();
-            ScanService.scanData.telemetryData.corrAccelY = in.readFloat();
-            ScanService.scanData.telemetryData.corrAccelZ = in.readFloat();
-            ScanService.scanData.telemetryData.corrCoG = in.readFloat();
-            ScanService.scanData.telemetryData.corrOrientY = in.readFloat();
-            ScanService.scanData.telemetryData.corrOrientZ = in.readFloat();
+            ScanService.getScanData().setFreeHotspotWLANs(in.readInt());
+            ScanService.getScanData().telemetryData.corrAccelX = in.readFloat();
+            ScanService.getScanData().telemetryData.corrAccelY = in.readFloat();
+            ScanService.getScanData().telemetryData.corrAccelZ = in.readFloat();
+            ScanService.getScanData().telemetryData.corrCoG = in.readFloat();
+            ScanService.getScanData().telemetryData.corrOrientY = in.readFloat();
+            ScanService.getScanData().telemetryData.corrOrientZ = in.readFloat();
             in.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -722,7 +722,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         try {
             in = new DataInputStream(openFileInput(OWMapAtAndroid.WSCAN_FILE));
             int i = in.available();
-            ScanService.scanData.setStoredValues(i / 28);
+            ScanService.getScanData().setStoredValues(i / 28);
             in.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -732,8 +732,8 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
 
     private void updateRank() {
-        if (ScanService.scanData.uploadedRank > 0) {
-            rankText.setText(ctx.getResources().getText(R.string.rank) + ": " + ScanService.scanData.uploadedRank + " (" + ScanService.scanData.uploadedCount + " " + ctx.getResources().getText(R.string.points).toString() + ")");
+        if (ScanService.getScanData().uploadedRank > 0) {
+            rankText.setText(ctx.getResources().getText(R.string.rank) + ": " + ScanService.getScanData().uploadedRank + " (" + ScanService.getScanData().uploadedCount + " " + ctx.getResources().getText(R.string.points).toString() + ")");
 //         ctx.mapButton.setEnabled(true);
         } else {
             rankText.setText(ctx.getResources().getText(R.string.rank) + ": --");
@@ -743,13 +743,13 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
 
     static void sendMessage(int what, int arg1, int arg2, Object obj) {
-        if (ScanService.scanData.appVisible) {
+        if (ScanService.getScanData().appVisible) {
             Message msg = new Message();
             msg.what = what;
             msg.arg1 = arg1;
             msg.arg2 = arg2;
             msg.obj = obj;
-            ScanService.scanData.ctx.scannerHandler.sendMessage(msg);
+            ScanService.getScanData().ctx.scannerHandler.sendMessage(msg);
         }
     }
    
@@ -778,10 +778,10 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
         do {
             configChanged = false;
-            if (ScanService.scanData.threadMode == THREAD_MODE_SCAN) {
-                ScanService.scanData.lock.lock();
-                for (j = 0; j < ScanService.scanData.wmapList.size(); j++) {
-                    currEntry = ScanService.scanData.wmapList.elementAt(j);
+            if (ScanService.getScanData().threadMode == THREAD_MODE_SCAN) {
+                ScanService.getScanData().getLock().lock();
+                for (j = 0; j < ScanService.getScanData().wmapList.size(); j++) {
+                    currEntry = ScanService.getScanData().wmapList.elementAt(j);
                     if ((currEntry.flags & WMapEntry.FLAG_UI_USED) == 0) {
 //                   currEntry.createUIData(this);
                         sendMessage(ScannerHandler.MSG_ADD_ENTRY, 0, 0, currEntry);
@@ -795,27 +795,27 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                     }
                 }
                 if (scannerHandler.liveMapView != null)
-                    ScanService.scanData.ctx.scannerHandler.sendEmptyMessage(ScannerHandler.MSG_UPD_LIVE_MAP);
+                    ScanService.getScanData().ctx.scannerHandler.sendEmptyMessage(ScannerHandler.MSG_UPD_LIVE_MAP);
 
-                ScanService.scanData.lock.unlock();
-                if (configChanged) ScanService.scanData.service.storeConfig();
+                ScanService.getScanData().getLock().unlock();
+                if (configChanged) ScanService.getScanData().service.storeConfig();
                 try {
                     Thread.sleep(1100);
                 } catch (InterruptedException ie) {
 
                 }
-            } else if (ScanService.scanData.threadMode == THREAD_MODE_UPLOAD) {
+            } else if (ScanService.getScanData().threadMode == THREAD_MODE_UPLOAD) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ie) {
 
                 }
-            } else if (ScanService.scanData.threadMode == THREAD_MODE_MAP) {
+            } else if (ScanService.getScanData().threadMode == THREAD_MODE_MAP) {
 //            if (mapView!=null) mapView.loadMap(ScanService.scanData.ownBSSID);
-                ScanService.scanData.threadMode = THREAD_MODE_SCAN;
+                ScanService.getScanData().threadMode = THREAD_MODE_SCAN;
             }
         }
-        while (ScanService.scanData.isActive);
+        while (ScanService.getScanData().isActive);
     }
 
     public boolean onSearchRequested() {
@@ -823,7 +823,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
     }
 
     public void onBackPressed() {
-        if (ScanService.scanData.viewMode == VIEW_MODE_MAP) {
+        if (ScanService.getScanData().viewMode == VIEW_MODE_MAP) {
             scannerHandler.rootLayout.removeView(scannerHandler.mapView);
             scannerHandler.mapView = null;
             try {
@@ -832,11 +832,11 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
             } catch (NullPointerException npe) {
                 // just a workaround: mapOverlay is sometimes not valid...
             }
-            ScanService.scanData.viewMode = VIEW_MODE_MAIN;
+            ScanService.getScanData().viewMode = VIEW_MODE_MAIN;
             scannerHandler.rootLayout.invalidate();
-        } else if (ScanService.scanData.viewMode == VIEW_MODE_FF_LIST) {
+        } else if (ScanService.getScanData().viewMode == VIEW_MODE_FF_LIST) {
             scannerHandler.rootLayout.removeView(ffLv);
-            ScanService.scanData.viewMode = VIEW_MODE_MAIN;
+            ScanService.getScanData().viewMode = VIEW_MODE_MAIN;
             scannerHandler.rootLayout.invalidate();
         } else
             simpleAlert(getResources().getText(R.string.really_exit_app).toString(), null, ALERT_NO_EXIT);
@@ -845,36 +845,36 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
 
     public void onClick(View v) {
         if (v == noNetAccCB) {
-            if (noNetAccCB.isChecked()) ScanService.scanData.setFlags(FLAG_NO_NET_ACCESS);
-            else ScanService.scanData.setFlags(0);
+            if (noNetAccCB.isChecked()) ScanService.getScanData().setFlags(FLAG_NO_NET_ACCESS);
+            else ScanService.getScanData().setFlags(0);
             SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             showMap = SP.getBoolean("showMap", false);
-            ScanService.scanData.service.storeConfig();
+            ScanService.getScanData().service.storeConfig();
         }
     }
 
 
     protected void onResume() {
-        ScanService.scanData.isActive = true;
+        ScanService.getScanData().isActive = true;
         super.onResume();
-        ScanService.scanData.appVisible = true;
-        if (ScanService.scanData.mView != null) ScanService.scanData.mView.postInvalidate();
-        if (ScanService.scanData.watchThread != null) {
+        ScanService.getScanData().appVisible = true;
+        if (ScanService.getScanData().mView != null) ScanService.getScanData().mView.postInvalidate();
+        if (ScanService.getScanData().watchThread != null) {
             try {
-                ScanService.scanData.watchThread.join(100); // wait a bit to check if it already has received a previous interruption
+                ScanService.getScanData().watchThread.join(100); // wait a bit to check if it already has received a previous interruption
             } catch (InterruptedException ie) {
             }
         }
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         scannerHandler.bigCounter = SP.getBoolean("bigCounter", false);
-        ScanService.scanData.hudCounter = SP.getBoolean("hudCounter", false);
+        ScanService.getScanData().hudCounter = SP.getBoolean("hudCounter", false);
         showMap = SP.getBoolean("showMap", false);
         try {
-            ScanService.scanData.uploadThres = Integer.parseInt(SP.getString("autoUpload", "0"));
+            ScanService.getScanData().uploadThres = Integer.parseInt(SP.getString("autoUpload", "0"));
         } catch (NumberFormatException nfe) {
         }
         try {
-            ScanService.scanData.noGPSExit = Integer.parseInt(SP.getString("noGPSExit", "0")) * 60 * 1000;
+            ScanService.getScanData().noGPSExit = Integer.parseInt(SP.getString("noGPSExit", "0")) * 60 * 1000;
         } catch (NumberFormatException nfe) {
         }
 
@@ -884,8 +884,8 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
             int val1 = 0, val2 = 0;
 
             try {
-                val1 = Integer.parseInt(ScanService.scanData.ownBSSID.substring(0, 6), 16);
-                val2 = Integer.parseInt(ScanService.scanData.ownBSSID.substring(6), 16);
+                val1 = Integer.parseInt(ScanService.getScanData().ownBSSID.substring(0, 6), 16);
+                val2 = Integer.parseInt(ScanService.getScanData().ownBSSID.substring(6), 16);
             } catch (NumberFormatException nfe) {
 
             }
@@ -897,10 +897,10 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         if (scannerHandler.liveMapView != null)
             scannerHandler.liveMapView.setMapMode(SP.getString("mapType", "2"));
 
-        if ((ScanService.scanData.watchThread == null) || (!ScanService.scanData.watchThread.isAlive())) {
-            ScanService.scanData.isActive = true;
-            ScanService.scanData.watchThread = new Thread(this);
-            ScanService.scanData.watchThread.start();
+        if ((ScanService.getScanData().watchThread == null) || (!ScanService.getScanData().watchThread.isAlive())) {
+            ScanService.getScanData().isActive = true;
+            ScanService.getScanData().watchThread = new Thread(this);
+            ScanService.getScanData().watchThread.start();
         }
 //      else initView();
 
@@ -914,20 +914,20 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         int j;
 
         //if (wl != null) wl.release();
-        ScanService.scanData.isActive = false; // try to stop the thread
-        if (ScanService.scanData.viewMode == VIEW_MODE_MAP) onBackPressed();
+        ScanService.getScanData().isActive = false; // try to stop the thread
+        if (ScanService.getScanData().viewMode == VIEW_MODE_MAP) onBackPressed();
 //       mSensorManager.unregisterListener(this);
-        ScanService.scanData.appVisible = false;
-        if (ScanService.scanData.mView != null) ScanService.scanData.mView.postInvalidate();
-        ScanService.scanData.lock.lock();
-        if (ScanService.scanData.wmapList.size() > 0)
-            for (j = 0; j < ScanService.scanData.wmapList.size(); j++) {
-                currEntry = ScanService.scanData.wmapList.elementAt(j);
+        ScanService.getScanData().appVisible = false;
+        if (ScanService.getScanData().mView != null) ScanService.getScanData().mView.postInvalidate();
+        ScanService.getScanData().getLock().lock();
+        if (ScanService.getScanData().wmapList.size() > 0)
+            for (j = 0; j < ScanService.getScanData().wmapList.size(); j++) {
+                currEntry = ScanService.getScanData().wmapList.elementAt(j);
                 currEntry.flags &= ~WMapEntry.FLAG_UI_USED;
                 currEntry.flags &= ~WMapEntry.FLAG_IS_VISIBLE;
                 scannerHandler.parentTable.removeView(currEntry.row);
             }
-        ScanService.scanData.lock.unlock();
+        ScanService.getScanData().getLock().unlock();
         super.onPause();
     }
 

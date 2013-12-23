@@ -188,7 +188,7 @@ public class LiveMapView extends View implements Runnable {
                         }
 
                         if (!foundExisting)
-                            mapData[1 - currMap].locTile[x][y] = geoUtils.loadMapTile(getContext(), mapData[1 - currMap].locTileX[x][y], mapData[1 - currMap].locTileY[x][y], m_zoom, ((ScanService.scanData.getFlags() & OWMapAtAndroid.FLAG_NO_NET_ACCESS) == 0));
+                            mapData[1 - currMap].locTile[x][y] = geoUtils.loadMapTile(getContext(), mapData[1 - currMap].locTileX[x][y], mapData[1 - currMap].locTileY[x][y], m_zoom, ((ScanService.getScanData().getFlags() & OWMapAtAndroid.FLAG_NO_NET_ACCESS) == 0));
                     }
                 }
             lock.lock();
@@ -239,9 +239,9 @@ public class LiveMapView extends View implements Runnable {
             c.drawLine(cx - 20, cy, cx + 20, cy, posColour);
             c.drawLine(cx, cy - 20, cx, cy + 20, posColour);
 
-            ScanService.scanData.lock.lock();
-            for (i = 0; i < ScanService.scanData.wmapList.size(); i++) {
-                entry = ScanService.scanData.wmapList.elementAt(i);
+            ScanService.getScanData().getLock().lock();
+            for (i = 0; i < ScanService.getScanData().wmapList.size(); i++) {
+                entry = ScanService.getScanData().wmapList.elementAt(i);
                 cy = (float) ((mapData[currMap].shiftY * 256 + 256.0 * (entry.getLat() - tileLat1) / (tileLat2 - tileLat1)));
                 cx = (float) ((mapData[currMap].shiftX * 256 + 256.0 * (entry.getLon() - tileLon1) / (tileLon2 - tileLon1)));
                 if ((entry.flags & WMapEntry.FLAG_IS_FREIFUNK) != 0) {
@@ -258,7 +258,7 @@ public class LiveMapView extends View implements Runnable {
                     c.drawBitmap(openWlanBitmap, cx - 7, cy - 7, null);
                 }
             }
-            ScanService.scanData.lock.unlock();
+            ScanService.getScanData().getLock().unlock();
             lock.unlock();
         }
 

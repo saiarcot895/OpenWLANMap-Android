@@ -30,9 +30,9 @@ class HUDView extends ViewGroup {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (!ScanService.scanData.hudCounter) return;
+        if (!ScanService.getScanData().hudCounter) return;
         if (!myKM.inKeyguardRestrictedInputMode()) {
-            if (ScanService.scanData.appVisible) return;
+            if (ScanService.getScanData().appVisible) return;
         }
 
         super.onDraw(canvas);

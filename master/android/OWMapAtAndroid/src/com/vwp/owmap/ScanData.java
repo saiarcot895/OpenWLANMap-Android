@@ -9,7 +9,7 @@ import android.net.wifi.*;
 import android.widget.TextView;
 
 public class ScanData {
-    Lock lock = new ReentrantLock();
+    private Lock lock = new ReentrantLock();
     Vector<WMapEntry> wmapList = new Vector<WMapEntry>();
     OWMapAtAndroid ctx;
     private int flags = OWMapAtAndroid.FLAG_NO_NET_ACCESS, storedValues;
@@ -25,10 +25,6 @@ public class ScanData {
     Thread watchThread = null;
     TelemetryData telemetryData = new TelemetryData();
     ScanService service = null;
-
-
-    ScanData() {
-    }
 
     void init(OWMapAtAndroid ctx) {
         this.ctx = ctx;
@@ -122,4 +118,7 @@ public class ScanData {
     }
 
 
+    public Lock getLock() {
+        return lock;
+    }
 }

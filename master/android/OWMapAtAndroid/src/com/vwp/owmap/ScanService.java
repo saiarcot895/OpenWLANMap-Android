@@ -32,7 +32,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
     private NotificationManager mManager;
     private ConnectivityManager connManager;
     private SharedPreferences SP;
-    static ScanData scanData = new ScanData();
+    private static ScanData scanData = new ScanData();
     private SensorManager sensorManager;
     private long lastTelemetryTime;
     private long lastGPSTime = System.currentTimeMillis();
@@ -40,6 +40,10 @@ public class ScanService extends Service implements Runnable, SensorEventListene
     private float m_lastSpeed;
     private UploadThread m_uploadThread;
     private Notification notification;
+
+    public static ScanData getScanData() {
+        return scanData;
+    }
 
     @Override
     public IBinder onBind(Intent arg) {
@@ -102,9 +106,9 @@ public class ScanService extends Service implements Runnable, SensorEventListene
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
         startForeground(1703, notification);
 
-        scanData.service = this;
-        scanData.mView = new HUDView(this);
-        scanData.mView.setValue(scanData.incStoredValues());
+        getScanData().service = this;
+        getScanData().mView = new HUDView(this);
+        getScanData().mView.setValue(getScanData().incStoredValues());
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -112,7 +116,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
         params.gravity = Gravity.LEFT | Gravity.BOTTOM;
         params.setTitle("Load Average");
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        wm.addView(scanData.mView, params);
+        wm.addView(getScanData().mView, params);
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
@@ -120,7 +124,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_GAME);
         sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
         mSensor = sensors.get(0);
-        scanData.telemetryData.setAccelMax(mSensor.getMaximumRange());
+        getScanData().telemetryData.setAccelMax(mSensor.getMaximumRange());
         telemetryDir = Environment.getExternalStorageDirectory().getPath() + "/telemetry/";
         File dir = new File(telemetryDir);
         dir.mkdir();
@@ -244,7 +248,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                 if (radius < OWMapAtAndroid.MAX_RADIUS) {
                     if (GeoUtils.latlon2dist(lat, lon, lastLat, lastLon) < 10) {
                         posValid = true; // use the position only when there is no too big jump in distance- elsewhere it could be a GPS bug
-                        ScanService.scanData.setLatLon(lastLat, lastLon);
+                        ScanService.getScanData().setLatLon(lastLat, lastLon);
                     }
                     lastLat = lat;
                     lastLon = lon;
@@ -478,7 +482,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                                 bssid = result.BSSID.replace(":", "").replace(".", "").toUpperCase(Locale.US);
                                 if (bssid.equalsIgnoreCase("000000000000")) break;
                                 foundExisting = false;
-                                scanData.lock.lock();
+                                scanData.getLock().lock();
                                 for (j = 0; j < scanData.wmapList.size(); j++) {
                                     currEntry = scanData.wmapList.elementAt(j);
                                     if (currEntry.BSSID.equalsIgnoreCase(bssid)) {
@@ -522,10 +526,10 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                                     }
                                 }
                                 result.capabilities = result.capabilities.toUpperCase(Locale.US);
-                                scanData.lock.unlock();
+                                scanData.getLock().unlock();
                             }
                         }
-                        scanData.lock.lock();
+                        scanData.getLock().lock();
                         for (j = 0; j < scanData.wmapList.size(); j++) {
                             currEntry = scanData.wmapList.elementAt(j);
                             if ((currEntry.lastUpdate + OWMapAtAndroid.RECV_TIMEOUT < System.currentTimeMillis()) && ((currEntry.flags & WMapEntry.FLAG_IS_VISIBLE) == 0)) {
@@ -582,7 +586,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                             }
                             //               flushData(false);
                         }
-                        scanData.lock.unlock();
+                        scanData.getLock().unlock();
                         m_lastSpeed = locationInfo.lastSpeed;
                         if (!SP.getBoolean("adaptiveScanning", true)) sleepTime = 500;
                         else if (locationInfo.lastSpeed > 90) sleepTime = 350;
