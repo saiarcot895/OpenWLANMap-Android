@@ -17,6 +17,7 @@ import android.net.wifi.*;
 import android.net.*;
 import android.net.wifi.WifiConfiguration.*;
 import android.preference.*;
+import android.support.v4.app.NotificationCompat;
 import android.view.*;
 import android.hardware.*;
 
@@ -95,7 +96,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        notification = new Notification.Builder(this)
+        notification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle(getResources().getText(R.string.app_name))
                 .setContentText("")
