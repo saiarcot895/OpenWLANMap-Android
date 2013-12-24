@@ -72,6 +72,13 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
 
+                            <CheckBox
+                                android:id="@+id/noNetAccessBox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="fill_horizontal"
+                                android:text="@string/no_net_access" />
+
                             <LinearLayout
                                 android:id="@+id/CBLinLayout"
                                 android:layout_width="wrap_content"
@@ -79,12 +86,6 @@
                                 android:layout_gravity="fill_horizontal"
                                 android:orientation="horizontal">
 
-                                <CheckBox
-                                    android:id="@+id/noNetAccessBox"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="fill_horizontal"
-                                    android:text="@string/no_net_access" />
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
@@ -93,7 +94,46 @@
                         android:id="@+id/currListTableLayout"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:stretchColumns="1,2,3" />
+                        android:stretchColumns="1,2,3" >
+
+                        <TableRow
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceSmall"
+                                android:text="    "
+                                android:id="@+id/textView" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceSmall"
+                                android:text="    "
+                                android:id="@+id/textView2" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceSmall"
+                                android:text="    "
+                                android:id="@+id/textView3" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceSmall"
+                                android:id="@+id/latTableText" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceSmall"
+                                android:id="@+id/lonTableText" />
+                        </TableRow>
+                    </TableLayout>
                 </LinearLayout>
             </TableRow>
         </TableLayout>
