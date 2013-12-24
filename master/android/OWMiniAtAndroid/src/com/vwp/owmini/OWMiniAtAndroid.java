@@ -386,8 +386,6 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 
 
     private void createUI() {
-        this.setTitle(getResources().getText(R.string.app_name).toString());
-
         scannerHandler.rootLayout = (FrameLayout) findViewById(R.id.rootLayout);
         scannerHandler.parentTable = (TableLayout) findViewById(R.id.currListTableLayout);
         scannerHandler.mapTable = (TableLayout) findViewById(R.id.mapTableLayout);
@@ -480,10 +478,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
             getIntent().putExtra("autostarted", false);
         }
 
-        try {
-            textSizeVal = Integer.parseInt(SP.getString("textSize", "1"));
-        } catch (NumberFormatException nfe) {
-        }
+        textSizeVal = Integer.parseInt(SP.getString("textSize", "1"));
 
         super.onCreate(savedInstanceState);
         pm = (PowerManager) getSystemService(POWER_SERVICE);
@@ -596,7 +591,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
     }
 
 
-    protected void updateRank() {
+    private void updateRank() {
         if (ScanService.scanData.uploadedRank > 0) {
             rankText.setText(ctx.getResources().getText(R.string.rank) + ": " + ScanService.scanData.uploadedRank + " (" + ScanService.scanData.uploadedCount + " " + ctx.getResources().getText(R.string.points).toString() + ")");
 //         ctx.mapButton.setEnabled(true);
