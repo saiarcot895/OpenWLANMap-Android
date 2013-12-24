@@ -517,72 +517,50 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
     }
 
 
-    public boolean onPrepareOptionsMenu(Menu pMenu) {
-        pMenu.clear();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
 
-        MenuItem prefsMenuItem = pMenu.add(0, 1, Menu.NONE, R.string.exit);
-        prefsMenuItem.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-
-        prefsMenuItem = pMenu.add(0, 2, Menu.NONE, R.string.upload_data);
-        prefsMenuItem.setIcon(android.R.drawable.ic_menu_upload);
-
-        prefsMenuItem = pMenu.add(0, 3, Menu.NONE, R.string.freehotspot);
-        prefsMenuItem.setIcon(android.R.drawable.ic_menu_search);
+        MenuItem prefsMenuItem = menu.findItem(R.id.freehotspot);
         prefsMenuItem.setEnabled(hasPosLock & ((ScanService.scanData.getFlags() & FLAG_NO_NET_ACCESS) == 0));
 
-        prefsMenuItem = pMenu.add(0, 4, Menu.NONE, R.string.prefs);
-        prefsMenuItem.setIcon(android.R.drawable.ic_menu_preferences);
-
-        prefsMenuItem = pMenu.add(0, 5, Menu.NONE, R.string.teamid);
-        try {
-            prefsMenuItem.setIcon(android.R.drawable.ic_menu_share);
-        } catch (NullPointerException npe) {
-            //seems to be missing on some systems
-        }
-
-        prefsMenuItem = pMenu.add(0, 6, Menu.NONE, R.string.help);
-        prefsMenuItem.setIcon(android.R.drawable.ic_menu_help);
-
-        prefsMenuItem = pMenu.add(0, 7, Menu.NONE, R.string.credits);
-        prefsMenuItem.setIcon(android.R.drawable.ic_menu_info_details);
-
-        return super.onCreateOptionsMenu(pMenu);
+        return super.onCreateOptionsMenu(menu);
     }
 
 
+    @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
-            case 1:
+            case R.id.exit:
                 simpleAlert(getResources().getText(R.string.really_exit_app).toString(), null, ALERT_NO_EXIT);
                 break;
-            case 2: {
+            case R.id.upload_data:
                 ScanService.scanData.threadMode = THREAD_MODE_UPLOAD;
-            }
-            break;
-            case 3:
+                break;
+            case R.id.freehotspot:
                 scannerHandler.sendEmptyMessage(OWMiniAtAndroid.ScannerHandler.MSG_GET_FREEHOTSPOT_POS_DL);
                 break;
-            case 4:
+            case R.id.prefs:
                 Intent intent = new Intent(this, com.vwp.owmini.OWLMapPrefs.class);
                 startActivity(intent);
                 break;
-            case 5: {
+            case R.id.teamid:
                 String text;
 
                 text = getResources().getText(R.string.teamtext).toString();
                 text = text + "\n";
 
-                StringBuffer s = new StringBuffer(ScanService.scanData.ownBSSID);
+                StringBuilder s = new StringBuilder(ScanService.scanData.ownBSSID);
                 s.reverse();
                 text = text + s;
 
                 simpleAlert(text, null, ALERT_OK);
                 break;
-            }
-            case 6:
+            case R.id.help:
                 simpleAlert(getResources().getText(R.string.help_txt).toString(), null, ALERT_OK);
                 break;
-            case 7:
+            case R.id.credits:
                 simpleAlert("Credits go to: XcinnaY, Tobias, Volker, Keith and Christian\n...for translations, help, ideas, testing and detailed feedback\nThe OpenStreetMap team for map data", null, ALERT_OK);
                 break;
             default:
