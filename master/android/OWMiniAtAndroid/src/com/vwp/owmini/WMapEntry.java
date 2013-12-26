@@ -4,7 +4,6 @@ import android.preference.PreferenceManager;
 import android.view.*;
 import android.widget.*;
 import android.content.*;
-import android.widget.ImageView;
 
 
 public class WMapEntry {
@@ -15,7 +14,6 @@ public class WMapEntry {
     long lastUpdate;
     TableRow row;
     TextView latView = null, lonView = null, addInfoView = null;
-    private TextView bssidView;
     int listPos = 0;
     int flags = 0;
 
@@ -71,7 +69,7 @@ public class WMapEntry {
         cntText.setText(listPos + ". ");
         row.addView(cntText);
 
-        bssidView = new TextView(ctx);
+        TextView bssidView = new TextView(ctx);
         OWMiniAtAndroid.setTextStyle(ctx, bssidView);
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(ctx);

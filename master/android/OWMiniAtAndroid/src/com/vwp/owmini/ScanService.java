@@ -30,7 +30,6 @@ public class ScanService extends Service implements Runnable {
     private double lastLat = 0.0, lastLon = 0.0, lastRadius;
     private Thread scanThread;
     private PowerManager.WakeLock wl = null;
-    private PowerManager pm;
     private NotificationManager mManager;
     private SharedPreferences SP;
     static ScanData scanData = new ScanData();
@@ -48,7 +47,7 @@ public class ScanService extends Service implements Runnable {
 
         if (scanData == null) return; // no ScanData, not possible to run correctly...
 
-        pm = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         try {
             screenLightVal = Integer.parseInt(SP.getString("screenLight", "2"));

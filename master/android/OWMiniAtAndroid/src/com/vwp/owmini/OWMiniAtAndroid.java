@@ -463,7 +463,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         textSizeVal = Integer.parseInt(SP.getString("textSize", "1"));
 
         super.onCreate(savedInstanceState);
-        pm = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "OpenWLANMapMiniMain");
         scannerHandler = new ScannerHandler();
         scannerHandler.owmp = this;
