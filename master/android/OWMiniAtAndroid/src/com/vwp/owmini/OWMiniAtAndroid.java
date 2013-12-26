@@ -48,8 +48,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
     static boolean doTrack = true, hasPosLock = false;
     private TextView rankText;
     ScannerHandler scannerHandler = null;
-    private PowerManager pm = null;
-    private PowerManager.WakeLock wl = null;
+    //private PowerManager.WakeLock wl = null;
     private Vector<WMapSlimEntry> freeHotspotList;
     private ListView ffLv;
 
@@ -68,14 +67,14 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
             else ad.setMessage("missing ressource!");
             if (title != null) ad.setTitle(title);
             if (mode == ALERT_OK) {
-                ad.setButton(ctx.getResources().getText(R.string.ok), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_POSITIVE, ctx.getResources().getText(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
             } else if (mode == ALERT_GPSWARN) {
-                ad.setButton(ctx.getResources().getText(R.string.ok), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_POSITIVE, ctx.getResources().getText(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -84,7 +83,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                     }
                 });
             } else if (mode == ALERT_NO_EXIT) {
-                ad.setButton(ctx.getResources().getText(R.string.exit), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_POSITIVE, ctx.getResources().getText(R.string.exit), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ScanService.running = false;
@@ -94,7 +93,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                         //                 System.exit(0);
                     }
                 });
-                ad.setButton2(ctx.getResources().getText(R.string.no), new DialogInterface.OnClickListener() {
+                ad.setButton(DialogInterface.BUTTON_NEGATIVE, ctx.getResources().getText(R.string.no), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -209,7 +208,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                 String outString;
                 HttpURLConnection c = null;
                 DataOutputStream os = null;
-                DataInputStream is = null;
+                BufferedReader is = null;
 
                 outString = ScanService.scanData.getLat() + "\n" + ScanService.scanData.getLon() + "\n";
                 try {
@@ -228,12 +227,12 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                     os.flush();
                     c.getResponseCode();
                     os.close();
-                    is = new DataInputStream(c.getInputStream());
+                    is = new BufferedReader(new InputStreamReader(c.getInputStream()));
                     outString = is.readLine();
                     owmp.freeHotspotList = new Vector<WMapSlimEntry>();
                     if (outString.equalsIgnoreCase("0")) {
                         try {
-                            while (is.available() > 0) {
+                            while (is.ready()) {
                                 WMapSlimEntry entry = new WMapSlimEntry(is.readLine(), is.readLine());
                                 owmp.freeHotspotList.add(entry);
                             }
@@ -300,7 +299,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                     entry = (WMapEntry) msg.obj;
                     if ((entry.flags & WMapEntry.FLAG_UI_USED) == 0) entry.createUIData(owmp);
                     if ((entry.flags & WMapEntry.FLAG_IS_VISIBLE) == 0) {
-                        parentTable.addView(entry.row, 1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.FILL_PARENT));
+                        parentTable.addView(entry.row, 1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
                         entry.flags |= WMapEntry.FLAG_IS_VISIBLE;
                     }
                     lock.unlock();
@@ -463,8 +462,6 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         textSizeVal = Integer.parseInt(SP.getString("textSize", "1"));
 
         super.onCreate(savedInstanceState);
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "OpenWLANMapMiniMain");
         scannerHandler = new ScannerHandler();
         scannerHandler.owmp = this;
         setContentView(R.layout.main);
@@ -720,7 +717,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 //      else initView();
 
 //       mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        if (wl != null) wl.acquire();
+        //if (wl != null) wl.acquire();
     }
 
 
@@ -728,7 +725,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         WMapEntry currEntry;
         int j;
 
-        if (wl != null) wl.release();
+        //if (wl != null) wl.release();
         ScanService.scanData.isActive = false; // try to stop the thread
         ScanService.scanData.appVisible = false;
         if (ScanService.scanData.mView != null) ScanService.scanData.mView.postInvalidate();

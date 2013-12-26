@@ -14,6 +14,7 @@ import android.graphics.*;
 import android.os.*;
 import android.net.wifi.*;
 import android.preference.*;
+import android.support.v4.app.NotificationCompat;
 import android.view.*;
 
 import org.apache.http.client.*;
@@ -80,8 +81,12 @@ public class ScanService extends Service implements Runnable {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        notification = new Notification(R.drawable.icon, getResources().getText(R.string.app_name).toString(), System.currentTimeMillis());
-        notification.setLatestEventInfo(this, getResources().getText(R.string.app_name).toString(), "", pendIntent);
+        notification = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.icon)
+                .setContentTitle(getResources().getText(R.string.app_name))
+                .setContentText("")
+                .setContentIntent(pendIntent)
+                .build();
 
         notification.flags |= Notification.FLAG_NO_CLEAR;
         notification.flags |= Notification.FLAG_ONGOING_EVENT;

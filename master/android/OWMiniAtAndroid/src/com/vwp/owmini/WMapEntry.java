@@ -13,7 +13,7 @@ public class WMapEntry {
     private int avgCtr = 0;
     long lastUpdate;
     TableRow row;
-    TextView latView = null, lonView = null, addInfoView = null;
+    TextView latView = null, lonView = null;
     int listPos = 0;
     int flags = 0;
 
@@ -49,7 +49,7 @@ public class WMapEntry {
 
         TableLayout.LayoutParams tableRowParams =
                 new TableLayout.LayoutParams
-                        (TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+                        (TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
 
         tableRowParams.setMargins(2, 2, 18, 2);
 
