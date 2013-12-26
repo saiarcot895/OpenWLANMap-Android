@@ -105,10 +105,10 @@ class UploadThread extends Thread {
             openIn = null;
         }
         uploadMap = new HashMap<String, WMapSlimEntry>();
-        ScanService.scanData.lock.lock();
+        ScanService.getScanData().getLock().lock();
         try {
-            scanningEnabled = ScanService.scanData.scanningEnabled;
-            ScanService.scanData.scanningEnabled = false;
+            scanningEnabled = ScanService.getScanData().scanningEnabled;
+            ScanService.getScanData().scanningEnabled = false;
             {
                 String txt;
 
@@ -135,12 +135,12 @@ class UploadThread extends Thread {
                 }
             }
             in.close();
-            ScanService.scanData.scanningEnabled = scanningEnabled;
+            ScanService.getScanData().scanningEnabled = scanningEnabled;
         } catch (IOException ioe2) {
         }
-        ScanService.scanData.lock.unlock();
+        ScanService.getScanData().getLock().unlock();
         System.gc();
-        outString = ScanService.scanData.ownBSSID + "\n";
+        outString = ScanService.getScanData().ownBSSID + "\n";
         if (tagName.length() > 20) tagName = tagName.substring(0, 20);
         outString = outString + "T\t" + tagName + "\n";
 
@@ -165,7 +165,7 @@ class UploadThread extends Thread {
         uploadMap = null;
 
         if (openIn != null) {
-            ScanService.scanData.lock.lock();
+            ScanService.getScanData().getLock().lock();
             openMap = new HashMap<String, String>();
             try {
                 while (openIn.available() >= 12) {
@@ -176,7 +176,7 @@ class UploadThread extends Thread {
                 openIn.close();
             } catch (IOException ioe2) {
             }//_:Ä:_Ö:_;
-            ScanService.scanData.lock.unlock();
+            ScanService.getScanData().getLock().unlock();
             openCollection = openMap.values();
             if (openCollection.size() > 0) {
                 openIt = openCollection.iterator();
@@ -280,8 +280,8 @@ class UploadThread extends Thread {
             is = null;
             ctx.deleteFile(OWMiniAtAndroid.WSCAN_FILE);
             ctx.deleteFile(OWMiniAtAndroid.WFREI_FILE);
-            ScanService.scanData.setStoredValues(0);
-            ScanService.scanData.setFreeHotspotWLANs(0);
+            ScanService.getScanData().setStoredValues(0);
+            ScanService.getScanData().setFreeHotspotWLANs(0);
             ctx.storeConfig();
             if (!silent) {
                 if (remoteVersion > version)

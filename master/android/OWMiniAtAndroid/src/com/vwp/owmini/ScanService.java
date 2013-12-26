@@ -33,9 +33,13 @@ public class ScanService extends Service implements Runnable {
     private PowerManager.WakeLock wl = null;
     private NotificationManager mManager;
     private SharedPreferences SP;
-    static ScanData scanData = new ScanData();
+    private static ScanData scanData = new ScanData();
     private UploadThread m_uploadThread;
     private Notification notification;
+
+    public static ScanData getScanData() {
+        return scanData;
+    }
 
     @Override
     public IBinder onBind(Intent arg) {
@@ -354,7 +358,7 @@ public class ScanService extends Service implements Runnable {
                                 bssid = result.BSSID.replace(":", "").replace(".", "").toUpperCase(Locale.US);
                                 if (bssid.equalsIgnoreCase("000000000000")) break;
                                 foundExisting = false;
-                                scanData.lock.lock();
+                                scanData.getLock().lock();
                                 for (j = 0; j < scanData.wmapList.size(); j++) {
                                     currEntry = scanData.wmapList.elementAt(j);
                                     if (currEntry.BSSID.equalsIgnoreCase(bssid)) {
@@ -391,10 +395,10 @@ public class ScanService extends Service implements Runnable {
                                     scanData.wmapList.add(currEntry);
                                 }
                                 result.capabilities = result.capabilities.toUpperCase(Locale.US);
-                                scanData.lock.unlock();
+                                scanData.getLock().unlock();
                             }
                         }
-                        scanData.lock.lock();
+                        scanData.getLock().lock();
                         for (j = 0; j < scanData.wmapList.size(); j++) {
                             currEntry = scanData.wmapList.elementAt(j);
                             if ((currEntry.lastUpdate + OWMiniAtAndroid.RECV_TIMEOUT < System.currentTimeMillis()) && ((currEntry.flags & WMapEntry.FLAG_IS_VISIBLE) == 0)) {
@@ -451,7 +455,7 @@ public class ScanService extends Service implements Runnable {
                             }
                             //               flushData(false);
                         }
-                        scanData.lock.unlock();
+                        scanData.getLock().unlock();
                         if (!SP.getBoolean("adaptiveScanning", true)) sleepTime = 500;
                         else if (locationInfo.lastSpeed > 90) sleepTime = 350;
                         else if (locationInfo.lastSpeed < 0)

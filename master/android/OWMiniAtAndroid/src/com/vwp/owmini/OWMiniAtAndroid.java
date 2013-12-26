@@ -147,13 +147,13 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 
         private void dbgUpdLocState(Message msg) {
             if (msg.arg1 < 0)
-                locStateText.setText(ScanService.scanData.ctx.getResources().getText(R.string.waitGPS) + " ");
+                locStateText.setText(ScanService.getScanData().ctx.getResources().getText(R.string.waitGPS) + " ");
             else {
                 String locText = "";
                 loc_info locationInfo;
 
                 if ((msg.arg1 > OWMiniAtAndroid.MAX_RADIUS * 1000) || (msg.arg2 == loc_info.LOC_METHOD_NONE)) {
-                    locText = ScanService.scanData.ctx.getResources().getText(R.string.waitGPS) + " ";
+                    locText = ScanService.getScanData().ctx.getResources().getText(R.string.waitGPS) + " ";
                     hasPosLock = false;
                 } else hasPosLock = true;
                 locationInfo = (loc_info) msg.obj;
@@ -176,14 +176,14 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 
 
         private void dbgUpdApCount(Message msg) {
-            apCountText.setText(ScanService.scanData.ctx.getResources().getText(R.string.ap_count).toString() + ": " + msg.arg1); //pj   q6uikcde
+            apCountText.setText(ScanService.getScanData().ctx.getResources().getText(R.string.ap_count).toString() + ": " + msg.arg1); //pj   q6uikcde
             if (bigCounter) {
                 bigCntText.setText("" + msg.arg1);
             } else {
                 bigCntText.setText("");
             }
-            if (ScanService.scanData.bigCntTextHud != null)
-                ScanService.scanData.bigCntTextHud.setText("" + msg.arg1);
+            if (ScanService.getScanData().bigCntTextHud != null)
+                ScanService.getScanData().bigCntTextHud.setText("" + msg.arg1);
         }
 
 
@@ -210,7 +210,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                 DataOutputStream os = null;
                 BufferedReader is = null;
 
-                outString = ScanService.scanData.getLat() + "\n" + ScanService.scanData.getLon() + "\n";
+                outString = ScanService.getScanData().getLat() + "\n" + ScanService.getScanData().getLon() + "\n";
                 try {
                     URL connectURL = new URL("http://www.openwlanmap.org/android/freifunk.php");
                     c = (HttpURLConnection) connectURL.openConnection();
@@ -261,7 +261,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            if (!ScanService.scanData.isActive) return;
+            if (!ScanService.getScanData().isActive) return;
             switch (msg.what) {
                 case MSG_TOAST:
                     Toast.makeText(owmp, (String) msg.obj, Toast.LENGTH_SHORT).show();
@@ -279,7 +279,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                         for (int i = 0; i < owmp.freeHotspotList.size(); i++) {
                             WMapSlimEntry entry = owmp.freeHotspotList.elementAt(i);
 
-                            String text = "" + GeoUtils.latlon2dist(ScanService.scanData.getLat(), ScanService.scanData.getLon(), entry.lat, entry.lon);
+                            String text = "" + GeoUtils.latlon2dist(ScanService.getScanData().getLat(), ScanService.getScanData().getLon(), entry.lat, entry.lon);
                             text = text.substring(0, 8);
                             text = text + " km";
                             adapter.add(text);
@@ -287,7 +287,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                         owmp.ffLv.setAdapter(adapter);
                         owmp.ffLv.setOnItemClickListener(owmp);
                         owmp.scannerHandler.rootLayout.addView(owmp.ffLv);
-                        ScanService.scanData.viewMode = VIEW_MODE_FF_LIST;
+                        ScanService.getScanData().viewMode = VIEW_MODE_FF_LIST;
                     }
                     OWMiniAtAndroid.sendMessage(OWMiniAtAndroid.ScannerHandler.MSG_CLOSE_PRG_DLG, 0, 0, null);
                     break;
@@ -413,27 +413,27 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
     private void createService(Bundle savedInstanceState) {
         if ((savedInstanceState == null) || (!savedInstanceState.getBoolean("init")) /*|| (ScanService.scanData == null)*/) {
 //         ScanService.scanData = new ScanData(this);
-            ScanService.scanData.init(this);
+            ScanService.getScanData().init(this);
 //         ScanService.scanData.ctx = this;
             loadConfig();
             startService(new Intent(this, ScanService.class));
         }
-        if (ScanService.scanData.wifiManager == null) ScanService.scanData.init(this);
-        if ((ScanService.scanData.getFlags() & FLAG_NO_NET_ACCESS) != 0) {
+        if (ScanService.getScanData().wifiManager == null) ScanService.getScanData().init(this);
+        if ((ScanService.getScanData().getFlags() & FLAG_NO_NET_ACCESS) != 0) {
             noNetAccCB.setChecked(true);
-            ScanService.scanData.wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, "OpenWLANMapMini");
+            ScanService.getScanData().wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, "OpenWLANMapMini");
         } else {
-            ScanService.scanData.wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "OpenWLANMapMini");
+            ScanService.getScanData().wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "OpenWLANMapMini");
         }
-        ScanService.scanData.ctx = this;
+        ScanService.getScanData().ctx = this;
     }
 
 
     private void setupInitial() {
-        WifiInfo wifiInfo = ScanService.scanData.wifiManager.getConnectionInfo();
+        WifiInfo wifiInfo = ScanService.getScanData().wifiManager.getConnectionInfo();
         if ((wifiInfo != null) && (wifiInfo.getMacAddress() != null))
-            ScanService.scanData.ownBSSID = wifiInfo.getMacAddress().replace(":", "").replace(".", "").toUpperCase(Locale.US);
-        else ScanService.scanData.ownBSSID = "00DEADBEEF00";
+            ScanService.getScanData().ownBSSID = wifiInfo.getMacAddress().replace(":", "").replace(".", "").toUpperCase(Locale.US);
+        else ScanService.getScanData().ownBSSID = "00DEADBEEF00";
         updateRank();
     }
 
@@ -473,10 +473,10 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         createUI();
 
         createService(savedInstanceState);
-        ScanService.scanData.hudCounter = SP.getBoolean("hudCounter", false);
+        ScanService.getScanData().hudCounter = SP.getBoolean("hudCounter", false);
         setupInitial();
 
-        sendMessage(ScannerHandler.MSG_UPD_AP_COUNT, ScanService.scanData.getStoredValues(), 0, null);
+        sendMessage(ScannerHandler.MSG_UPD_AP_COUNT, ScanService.getScanData().getStoredValues(), 0, null);
         if (sendToBack) moveTaskToBack(true);
     }
 
@@ -497,7 +497,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         inflater.inflate(R.menu.main_menu, menu);
 
         MenuItem prefsMenuItem = menu.findItem(R.id.freehotspot);
-        prefsMenuItem.setEnabled(hasPosLock & ((ScanService.scanData.getFlags() & FLAG_NO_NET_ACCESS) == 0));
+        prefsMenuItem.setEnabled(hasPosLock & ((ScanService.getScanData().getFlags() & FLAG_NO_NET_ACCESS) == 0));
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -510,7 +510,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                 simpleAlert(getResources().getText(R.string.really_exit_app).toString(), null, ALERT_NO_EXIT);
                 break;
             case R.id.upload_data:
-                ScanService.scanData.threadMode = THREAD_MODE_UPLOAD;
+                ScanService.getScanData().threadMode = THREAD_MODE_UPLOAD;
                 break;
             case R.id.freehotspot:
                 scannerHandler.sendEmptyMessage(OWMiniAtAndroid.ScannerHandler.MSG_GET_FREEHOTSPOT_POS_DL);
@@ -525,7 +525,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                 text = getResources().getText(R.string.teamtext).toString();
                 text = text + "\n";
 
-                StringBuilder s = new StringBuilder(ScanService.scanData.ownBSSID);
+                StringBuilder s = new StringBuilder(ScanService.getScanData().ownBSSID);
                 s.reverse();
                 text = text + s;
 
@@ -550,10 +550,10 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         try {
             in = new DataInputStream(ctx.openFileInput("wscnprefs"));
             in.readByte(); // version
-            ScanService.scanData.setFlags(in.readInt()); // operation flags;
-            ScanService.scanData.setStoredValues(in.readInt()); // number of currently stored values
-            ScanService.scanData.uploadedCount = in.readInt();
-            ScanService.scanData.uploadedRank = in.readInt();
+            ScanService.getScanData().setFlags(in.readInt()); // operation flags;
+            ScanService.getScanData().setStoredValues(in.readInt()); // number of currently stored values
+            ScanService.getScanData().uploadedCount = in.readInt();
+            ScanService.getScanData().uploadedRank = in.readInt();
             in.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -561,7 +561,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         try {
             in = new DataInputStream(openFileInput(OWMiniAtAndroid.WSCAN_FILE));
             int i = in.available();
-            ScanService.scanData.setStoredValues(i / 28);
+            ScanService.getScanData().setStoredValues(i / 28);
             in.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -571,8 +571,8 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 
 
     private void updateRank() {
-        if (ScanService.scanData.uploadedRank > 0) {
-            rankText.setText(ctx.getResources().getText(R.string.rank) + ": " + ScanService.scanData.uploadedRank + " (" + ScanService.scanData.uploadedCount + " " + ctx.getResources().getText(R.string.points).toString() + ")");
+        if (ScanService.getScanData().uploadedRank > 0) {
+            rankText.setText(ctx.getResources().getText(R.string.rank) + ": " + ScanService.getScanData().uploadedRank + " (" + ScanService.getScanData().uploadedCount + " " + ctx.getResources().getText(R.string.points).toString() + ")");
 //         ctx.mapButton.setEnabled(true);
         } else {
             rankText.setText(ctx.getResources().getText(R.string.rank) + ": --");
@@ -582,13 +582,13 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 
 
     static void sendMessage(int what, int arg1, int arg2, Object obj) {
-        if (ScanService.scanData.appVisible) {
+        if (ScanService.getScanData().appVisible) {
             Message msg = new Message();
             msg.what = what;
             msg.arg1 = arg1;
             msg.arg2 = arg2;
             msg.obj = obj;
-            ScanService.scanData.ctx.scannerHandler.sendMessage(msg);
+            ScanService.getScanData().ctx.scannerHandler.sendMessage(msg);
         }
     }
    
@@ -617,10 +617,10 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 
         do {
             configChanged = false;
-            if (ScanService.scanData.threadMode == THREAD_MODE_SCAN) {
-                ScanService.scanData.lock.lock();
-                for (j = 0; j < ScanService.scanData.wmapList.size(); j++) {
-                    currEntry = ScanService.scanData.wmapList.elementAt(j);
+            if (ScanService.getScanData().threadMode == THREAD_MODE_SCAN) {
+                ScanService.getScanData().getLock().lock();
+                for (j = 0; j < ScanService.getScanData().wmapList.size(); j++) {
+                    currEntry = ScanService.getScanData().wmapList.elementAt(j);
                     if ((currEntry.flags & WMapEntry.FLAG_UI_USED) == 0) {
 //                   currEntry.createUIData(this);
                         sendMessage(ScannerHandler.MSG_ADD_ENTRY, 0, 0, currEntry);
@@ -634,14 +634,14 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                     }
                 }
 
-                ScanService.scanData.lock.unlock();
-                if (configChanged) ScanService.scanData.service.storeConfig();
+                ScanService.getScanData().getLock().unlock();
+                if (configChanged) ScanService.getScanData().service.storeConfig();
                 try {
                     Thread.sleep(1100);
                 } catch (InterruptedException ie) {
 
                 }
-            } else if (ScanService.scanData.threadMode == THREAD_MODE_UPLOAD) {
+            } else if (ScanService.getScanData().threadMode == THREAD_MODE_UPLOAD) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ie) {
@@ -649,7 +649,7 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                 }
             }
         }
-        while (ScanService.scanData.isActive);
+        while (ScanService.getScanData().isActive);
     }
 
     public boolean onSearchRequested() {
@@ -657,9 +657,9 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
     }
 
     public void onBackPressed() {
-        if (ScanService.scanData.viewMode == VIEW_MODE_FF_LIST) {
+        if (ScanService.getScanData().viewMode == VIEW_MODE_FF_LIST) {
             scannerHandler.rootLayout.removeView(ffLv);
-            ScanService.scanData.viewMode = VIEW_MODE_MAIN;
+            ScanService.getScanData().viewMode = VIEW_MODE_MAIN;
             scannerHandler.rootLayout.invalidate();
         } else
             simpleAlert(getResources().getText(R.string.really_exit_app).toString(), null, ALERT_NO_EXIT);
@@ -668,29 +668,29 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 
     public void onClick(View v) {
         if (v == noNetAccCB) {
-            if (noNetAccCB.isChecked()) ScanService.scanData.setFlags(FLAG_NO_NET_ACCESS);
-            else ScanService.scanData.setFlags(0);
-            ScanService.scanData.service.storeConfig();
+            if (noNetAccCB.isChecked()) ScanService.getScanData().setFlags(FLAG_NO_NET_ACCESS);
+            else ScanService.getScanData().setFlags(0);
+            ScanService.getScanData().service.storeConfig();
         }
     }
 
 
     protected void onResume() {
-        ScanService.scanData.isActive = true;
+        ScanService.getScanData().isActive = true;
         super.onResume();
-        ScanService.scanData.appVisible = true;
-        if (ScanService.scanData.mView != null) ScanService.scanData.mView.postInvalidate();
-        if (ScanService.scanData.watchThread != null) {
+        ScanService.getScanData().appVisible = true;
+        if (ScanService.getScanData().mView != null) ScanService.getScanData().mView.postInvalidate();
+        if (ScanService.getScanData().watchThread != null) {
             try {
-                ScanService.scanData.watchThread.join(100); // wait a bit to check if it already has received a previous interruption
+                ScanService.getScanData().watchThread.join(100); // wait a bit to check if it already has received a previous interruption
             } catch (InterruptedException ie) {
             }
         }
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         scannerHandler.bigCounter = SP.getBoolean("bigCounter", false);
-        ScanService.scanData.hudCounter = SP.getBoolean("hudCounter", false);
+        ScanService.getScanData().hudCounter = SP.getBoolean("hudCounter", false);
         try {
-            ScanService.scanData.uploadThres = Integer.parseInt(SP.getString("autoUpload", "0"));
+            ScanService.getScanData().uploadThres = Integer.parseInt(SP.getString("autoUpload", "0"));
         } catch (NumberFormatException nfe) {
         }
         if ((!doTrack) && (SP.getBoolean("track", false))) {
@@ -698,8 +698,8 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
             int val1 = 0, val2 = 0;
 
             try {
-                val1 = Integer.parseInt(ScanService.scanData.ownBSSID.substring(0, 6), 16);
-                val2 = Integer.parseInt(ScanService.scanData.ownBSSID.substring(6), 16);
+                val1 = Integer.parseInt(ScanService.getScanData().ownBSSID.substring(0, 6), 16);
+                val2 = Integer.parseInt(ScanService.getScanData().ownBSSID.substring(6), 16);
             } catch (NumberFormatException nfe) {
 
             }
@@ -709,10 +709,10 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         }
         doTrack = SP.getBoolean("track", false);
 
-        if ((ScanService.scanData.watchThread == null) || (!ScanService.scanData.watchThread.isAlive())) {
-            ScanService.scanData.isActive = true;
-            ScanService.scanData.watchThread = new Thread(this);
-            ScanService.scanData.watchThread.start();
+        if ((ScanService.getScanData().watchThread == null) || (!ScanService.getScanData().watchThread.isAlive())) {
+            ScanService.getScanData().isActive = true;
+            ScanService.getScanData().watchThread = new Thread(this);
+            ScanService.getScanData().watchThread.start();
         }
 //      else initView();
 
@@ -726,18 +726,18 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         int j;
 
         //if (wl != null) wl.release();
-        ScanService.scanData.isActive = false; // try to stop the thread
-        ScanService.scanData.appVisible = false;
-        if (ScanService.scanData.mView != null) ScanService.scanData.mView.postInvalidate();
-        ScanService.scanData.lock.lock();
-        if (ScanService.scanData.wmapList.size() > 0)
-            for (j = 0; j < ScanService.scanData.wmapList.size(); j++) {
-                currEntry = ScanService.scanData.wmapList.elementAt(j);
+        ScanService.getScanData().isActive = false; // try to stop the thread
+        ScanService.getScanData().appVisible = false;
+        if (ScanService.getScanData().mView != null) ScanService.getScanData().mView.postInvalidate();
+        ScanService.getScanData().getLock().lock();
+        if (ScanService.getScanData().wmapList.size() > 0)
+            for (j = 0; j < ScanService.getScanData().wmapList.size(); j++) {
+                currEntry = ScanService.getScanData().wmapList.elementAt(j);
                 currEntry.flags &= ~WMapEntry.FLAG_UI_USED;
                 currEntry.flags &= ~WMapEntry.FLAG_IS_VISIBLE;
                 scannerHandler.parentTable.removeView(currEntry.row);
             }
-        ScanService.scanData.lock.unlock();
+        ScanService.getScanData().getLock().unlock();
         super.onPause();
     }
 
