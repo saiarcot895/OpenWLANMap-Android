@@ -107,8 +107,8 @@ class UploadThread extends Thread {
         uploadMap = new HashMap<String, WMapSlimEntry>();
         ScanService.getScanData().getLock().lock();
         try {
-            scanningEnabled = ScanService.getScanData().scanningEnabled;
-            ScanService.getScanData().scanningEnabled = false;
+            scanningEnabled = ScanService.getScanData().isScanningEnabled();
+            ScanService.getScanData().setScanningEnabled(false);
             {
                 String txt;
 
@@ -135,12 +135,12 @@ class UploadThread extends Thread {
                 }
             }
             in.close();
-            ScanService.getScanData().scanningEnabled = scanningEnabled;
+            ScanService.getScanData().setScanningEnabled(scanningEnabled);
         } catch (IOException ioe2) {
         }
         ScanService.getScanData().getLock().unlock();
         System.gc();
-        outString = ScanService.getScanData().ownBSSID + "\n";
+        outString = ScanService.getScanData().getOwnBSSID() + "\n";
         if (tagName.length() > 20) tagName = tagName.substring(0, 20);
         outString = outString + "T\t" + tagName + "\n";
 
@@ -259,9 +259,9 @@ class UploadThread extends Thread {
                 inString = is.readLine();
                 remoteVersion = Integer.parseInt(inString);
                 inString = is.readLine();
-                scanData.uploadedCount = Integer.parseInt(inString);
+                scanData.setUploadedCount(Integer.parseInt(inString));
                 inString = is.readLine();
-                scanData.uploadedRank = Integer.parseInt(inString);
+                scanData.setUploadedRank(Integer.parseInt(inString));
 
                 inString = is.readLine();
                 newAPs = Integer.parseInt(inString);
@@ -303,7 +303,7 @@ class UploadThread extends Thread {
         if (uploadSuccess) {
             if (!silent)
                 OWMiniAtAndroid.sendMessage(ScannerHandler.MSG_SIMPLE_ALERT, 0, 0,
-                        ctx.getResources().getText(R.string.your_new_rank).toString() + ": " + scanData.uploadedRank + " (" + scanData.uploadedCount + ctx.getResources().getText(R.string.points).toString() + ")\n\n" +
+                        ctx.getResources().getText(R.string.your_new_rank).toString() + ": " + scanData.getUploadedRank() + " (" + scanData.getUploadedCount() + ctx.getResources().getText(R.string.points).toString() + ")\n\n" +
                                 ctx.getResources().getText(R.string.stat_newAPs).toString() + ": " + newAPs + "\n" +
                                 ctx.getResources().getText(R.string.stat_updAPs).toString() + ": " + updAPs + "\n" +
                                 ctx.getResources().getText(R.string.stat_delAPs).toString() + ": " + delAPs + "\n" +

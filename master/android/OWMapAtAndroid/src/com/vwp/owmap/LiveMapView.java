@@ -240,8 +240,8 @@ public class LiveMapView extends View implements Runnable {
             c.drawLine(cx, cy - 20, cx, cy + 20, posColour);
 
             ScanService.getScanData().getLock().lock();
-            for (i = 0; i < ScanService.getScanData().wmapList.size(); i++) {
-                entry = ScanService.getScanData().wmapList.elementAt(i);
+            for (i = 0; i < ScanService.getScanData().getWmapList().size(); i++) {
+                entry = ScanService.getScanData().getWmapList().elementAt(i);
                 cy = (float) ((mapData[currMap].shiftY * 256 + 256.0 * (entry.getLat() - tileLat1) / (tileLat2 - tileLat1)));
                 cx = (float) ((mapData[currMap].shiftX * 256 + 256.0 * (entry.getLon() - tileLon1) / (tileLon2 - tileLon1)));
                 if ((entry.flags & WMapEntry.FLAG_IS_FREIFUNK) != 0) {

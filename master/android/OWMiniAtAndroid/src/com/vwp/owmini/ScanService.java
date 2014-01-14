@@ -77,7 +77,7 @@ public class ScanService extends Service implements Runnable {
         }
 
         try {
-            scanData.uploadThres = Integer.parseInt(SP.getString("autoUpload", "0"));
+            scanData.setUploadThres(Integer.parseInt(SP.getString("autoUpload", "0")));
         } catch (NumberFormatException nfe) {
         }
 
@@ -96,9 +96,9 @@ public class ScanService extends Service implements Runnable {
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
         startForeground(1703, notification);
 
-        scanData.service = this;
-        scanData.mView = new HUDView(this);
-        scanData.mView.setValue(scanData.incStoredValues());
+        scanData.setService(this);
+        scanData.setmView(new HUDView(this));
+        scanData.getmView().setValue(scanData.incStoredValues());
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -106,7 +106,7 @@ public class ScanService extends Service implements Runnable {
         params.gravity = Gravity.LEFT | Gravity.BOTTOM;
         params.setTitle("Load Average");
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        wm.addView(scanData.mView, params);
+        wm.addView(scanData.getmView(), params);
     }
 
 
@@ -116,9 +116,9 @@ public class ScanService extends Service implements Runnable {
 
         if (myWLocate != null) myWLocate.doPause();
 
-        if (scanData.mView != null) {
-            ((WindowManager) getSystemService(WINDOW_SERVICE)).removeView(scanData.mView);
-            scanData.mView = null;
+        if (scanData.getmView() != null) {
+            ((WindowManager) getSystemService(WINDOW_SERVICE)).removeView(scanData.getmView());
+            scanData.setmView(null);
         }
         try {
             if (wl != null) wl.release();
@@ -265,8 +265,8 @@ public class ScanService extends Service implements Runnable {
             out.writeByte(1); // version
             out.writeInt(ScanService.scanData.getFlags()); // operation flags;
             out.writeInt(ScanService.scanData.getStoredValues()); // number of currently stored values
-            out.writeInt(ScanService.scanData.uploadedCount);
-            out.writeInt(ScanService.scanData.uploadedRank);
+            out.writeInt(ScanService.scanData.getUploadedCount());
+            out.writeInt(ScanService.scanData.getUploadedRank());
             out.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -294,21 +294,21 @@ public class ScanService extends Service implements Runnable {
 
         while (running) {
             try {
-                if (ScanService.scanData.threadMode == OWMiniAtAndroid.THREAD_MODE_UPLOAD) {
+                if (ScanService.scanData.getThreadMode() == OWMiniAtAndroid.THREAD_MODE_UPLOAD) {
                     if ((m_uploadThread != null) && (m_uploadThread.isUploading()))
                         OWMiniAtAndroid.sendMessage(ScannerHandler.MSG_SIMPLE_ALERT, 0, 0, getResources().getText(R.string.upload_in_progress));
                     else
                         m_uploadThread = new UploadThread(scanData, this, SP, false, notification, null);
-                    ScanService.scanData.threadMode = OWMiniAtAndroid.THREAD_MODE_SCAN;
+                    ScanService.scanData.setThreadMode(OWMiniAtAndroid.THREAD_MODE_SCAN);
                 } else {
-                    if ((posState == 0) && (scanData != null) && (scanData.scanningEnabled)) {
+                    if ((posState == 0) && (scanData != null) && (scanData.isScanningEnabled())) {
                         posState = 1;
                         timeoutCtr = 0;
                         if (scanData.getFlags() != lastFlags) {
                             if ((scanData.getFlags() & OWMiniAtAndroid.FLAG_NO_NET_ACCESS) == 0)
-                                scanData.wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "OpenWLANMini");
+                                scanData.getWifiManager().createWifiLock(WifiManager.WIFI_MODE_FULL, "OpenWLANMini");
                             else
-                                scanData.wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, "OpenWLANMini");
+                                scanData.getWifiManager().createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, "OpenWLANMini");
                             lastFlags = scanData.getFlags();
                         }
                         if ((scanData.getFlags() & OWMiniAtAndroid.FLAG_NO_NET_ACCESS) == 0)
@@ -317,7 +317,7 @@ public class ScanService extends Service implements Runnable {
                             myWLocate.wloc_request_position(WLocate.FLAG_NO_NET_ACCESS | WLocate.FLAG_NO_IP_LOCATION);
                             //                  stopGoogleLocation();
                         }
-                    } else if (!scanData.scanningEnabled) {
+                    } else if (!scanData.isScanningEnabled()) {
                         try {
                             Thread.sleep(1500);
                         } catch (InterruptedException ie) {
@@ -341,8 +341,8 @@ public class ScanService extends Service implements Runnable {
 
                         locationInfo = myWLocate.last_location_info();
                         if (lastLocMethod != locationInfo.lastLocMethod) {
-                            scanData.mView.setMode(locationInfo.lastLocMethod);
-                            scanData.mView.postInvalidate();
+                            scanData.getmView().setMode(locationInfo.lastLocMethod);
+                            scanData.getmView().postInvalidate();
                             lastLocMethod = locationInfo.lastLocMethod;
                         }
                         if (posState == 100) locationInfo.lastLocMethod = -1;
@@ -359,8 +359,8 @@ public class ScanService extends Service implements Runnable {
                                 if (bssid.equalsIgnoreCase("000000000000")) break;
                                 foundExisting = false;
                                 scanData.getLock().lock();
-                                for (j = 0; j < scanData.wmapList.size(); j++) {
-                                    currEntry = scanData.wmapList.elementAt(j);
+                                for (j = 0; j < scanData.getWmapList().size(); j++) {
+                                    currEntry = scanData.getWmapList().elementAt(j);
                                     if (currEntry.BSSID.equalsIgnoreCase(bssid)) {
                                         currEntry.setPos(lastLat, lastLon);
                                         foundExisting = true;
@@ -371,8 +371,8 @@ public class ScanService extends Service implements Runnable {
                                     String lowerSSID;
 
                                     storedValues = scanData.incStoredValues();
-                                    scanData.mView.setValue(storedValues);
-                                    scanData.mView.postInvalidate();
+                                    scanData.getmView().setValue(storedValues);
+                                    scanData.getmView().postInvalidate();
                                     currEntry = new WMapEntry(bssid, result.SSID, lastLat, lastLon, storedValues);
                                     lowerSSID = result.SSID.toLowerCase(Locale.US);
                                     if ((lowerSSID.endsWith("_nomap")) ||      // Google unsubscibe option
@@ -392,22 +392,22 @@ public class ScanService extends Service implements Runnable {
                                     else currEntry.flags |= isFreeHotspot(result);
                                     if (isFreeHotspot(currEntry.flags))
                                         scanData.incFreeHotspotWLANs();
-                                    scanData.wmapList.add(currEntry);
+                                    scanData.getWmapList().add(currEntry);
                                 }
                                 result.capabilities = result.capabilities.toUpperCase(Locale.US);
                                 scanData.getLock().unlock();
                             }
                         }
                         scanData.getLock().lock();
-                        for (j = 0; j < scanData.wmapList.size(); j++) {
-                            currEntry = scanData.wmapList.elementAt(j);
+                        for (j = 0; j < scanData.getWmapList().size(); j++) {
+                            currEntry = scanData.getWmapList().elementAt(j);
                             if ((currEntry.lastUpdate + OWMiniAtAndroid.RECV_TIMEOUT < System.currentTimeMillis()) && ((currEntry.flags & WMapEntry.FLAG_IS_VISIBLE) == 0)) {
-                                scanData.wmapList.remove(j);
+                                scanData.getWmapList().remove(j);
                                 if (currEntry.posIsValid()) {
                                     int padBytes = 0, k;
 
                                     try {
-                                        in = scanData.ctx.openFileInput(OWMiniAtAndroid.WSCAN_FILE);
+                                        in = scanData.getCtx().openFileInput(OWMiniAtAndroid.WSCAN_FILE);
                                         padBytes = in.available() % 28;
                                         in.close();
                                         if (padBytes > 0) padBytes = 28 - padBytes;
@@ -415,7 +415,7 @@ public class ScanService extends Service implements Runnable {
                                         ioe.printStackTrace();
                                     }
                                     try {
-                                        out = new DataOutputStream(scanData.ctx.openFileOutput(OWMiniAtAndroid.WSCAN_FILE, Context.MODE_PRIVATE | Context.MODE_APPEND));
+                                        out = new DataOutputStream(scanData.getCtx().openFileOutput(OWMiniAtAndroid.WSCAN_FILE, Context.MODE_PRIVATE | Context.MODE_APPEND));
                                         if (padBytes > 0)
                                             for (k = 0; k < padBytes; k++) out.writeByte(0);
                                         out.write(currEntry.BSSID.getBytes(), 0, 12);
@@ -434,7 +434,7 @@ public class ScanService extends Service implements Runnable {
                                     if ((currEntry.flags & (WMapEntry.FLAG_IS_FREIFUNK | WMapEntry.FLAG_IS_NOMAP)) == WMapEntry.FLAG_IS_FREIFUNK) {
                                         padBytes = 0;
                                         try {
-                                            in = scanData.ctx.openFileInput(OWMiniAtAndroid.WFREI_FILE);
+                                            in = scanData.getCtx().openFileInput(OWMiniAtAndroid.WFREI_FILE);
                                             padBytes = in.available() % 12;
                                             in.close();
                                             if (padBytes > 0) padBytes = 12 - padBytes;
@@ -442,7 +442,7 @@ public class ScanService extends Service implements Runnable {
                                             ioe.printStackTrace();
                                         }
                                         try {
-                                            out = new DataOutputStream(scanData.ctx.openFileOutput(OWMiniAtAndroid.WFREI_FILE, Context.MODE_PRIVATE | Context.MODE_APPEND));
+                                            out = new DataOutputStream(scanData.getCtx().openFileOutput(OWMiniAtAndroid.WFREI_FILE, Context.MODE_PRIVATE | Context.MODE_APPEND));
                                             if (padBytes > 0)
                                                 for (k = 0; k < padBytes; k++) out.writeByte(0);
                                             out.write(currEntry.BSSID.getBytes(), 0, 12);
@@ -513,7 +513,7 @@ public class ScanService extends Service implements Runnable {
         HttpURLConnection c = null;
         DataOutputStream os = null;
 
-        outString = scanData.ownBSSID;
+        outString = scanData.getOwnBSSID();
         outString = outString + "\nL\tX\t" + lastLat + "\t" + lastLon + "\n";
 
         try {
