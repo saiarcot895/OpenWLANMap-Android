@@ -140,8 +140,8 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 
             lock.lock();
             entry = (WMapEntry) msg.obj;
-            parentTable.removeView(entry.row);
-            entry.flags &= ~WMapEntry.FLAG_IS_VISIBLE;
+            parentTable.removeView(entry.getRow());
+            entry.setFlags(entry.getFlags() & ~WMapEntry.FLAG_IS_VISIBLE);
             lock.unlock();
         }
 
@@ -295,10 +295,10 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
 
                     lock.lock();
                     entry = (WMapEntry) msg.obj;
-                    if ((entry.flags & WMapEntry.FLAG_UI_USED) == 0) entry.createUIData(owmp);
-                    if ((entry.flags & WMapEntry.FLAG_IS_VISIBLE) == 0) {
-                        parentTable.addView(entry.row, 1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                        entry.flags |= WMapEntry.FLAG_IS_VISIBLE;
+                    if ((entry.getFlags() & WMapEntry.FLAG_UI_USED) == 0) entry.createUIData(owmp);
+                    if ((entry.getFlags() & WMapEntry.FLAG_IS_VISIBLE) == 0) {
+                        parentTable.addView(entry.getRow(), 1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                        entry.setFlags(entry.getFlags() | WMapEntry.FLAG_IS_VISIBLE);
                     }
                     lock.unlock();
                     break;
@@ -312,8 +312,8 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                         WMapEntry entry;
 
                         entry = (WMapEntry) msg.obj;
-                        entry.latView.setText("" + (float) entry.getLat());
-                        entry.lonView.setText("" + (float) entry.getLon());
+                        entry.getLatView().setText("" + (float) entry.getLat());
+                        entry.getLonView().setText("" + (float) entry.getLon());
                         latTableText.setText(owmp.getResources().getText(R.string.lat));
                         lonTableText.setText(owmp.getResources().getText(R.string.lon));
                         mapTable.setColumnStretchable(0, true);
@@ -618,16 +618,16 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
                 ScanService.getScanData().getLock().lock();
                 for (j = 0; j < ScanService.getScanData().getWmapList().size(); j++) {
                     currEntry = ScanService.getScanData().getWmapList().elementAt(j);
-                    if ((currEntry.flags & WMapEntry.FLAG_UI_USED) == 0) {
+                    if ((currEntry.getFlags() & WMapEntry.FLAG_UI_USED) == 0) {
 //                   currEntry.createUIData(this);
                         sendMessage(ScannerHandler.MSG_ADD_ENTRY, 0, 0, currEntry);
                         configChanged = true; // store-count has changed
                     }
-                    if (currEntry.lastUpdate + RECV_TIMEOUT < System.currentTimeMillis())
+                    if (currEntry.getLastUpdate() + RECV_TIMEOUT < System.currentTimeMillis())
                         sendMessage(ScannerHandler.MSG_REM_ENTRY, 0, 0, currEntry);
-                    else if ((currEntry.flags & WMapEntry.FLAG_POS_CHANGED) != 0) {
+                    else if ((currEntry.getFlags() & WMapEntry.FLAG_POS_CHANGED) != 0) {
                         sendMessage(ScannerHandler.MSG_UPD_POS, 0, 0, currEntry);
-                        currEntry.flags &= ~WMapEntry.FLAG_POS_CHANGED;
+                        currEntry.setFlags(currEntry.getFlags() & ~WMapEntry.FLAG_POS_CHANGED);
                     }
                 }
 
@@ -730,9 +730,9 @@ public class OWMiniAtAndroid extends Activity implements OnClickListener, OnItem
         if (ScanService.getScanData().getWmapList().size() > 0)
             for (j = 0; j < ScanService.getScanData().getWmapList().size(); j++) {
                 currEntry = ScanService.getScanData().getWmapList().elementAt(j);
-                currEntry.flags &= ~WMapEntry.FLAG_UI_USED;
-                currEntry.flags &= ~WMapEntry.FLAG_IS_VISIBLE;
-                scannerHandler.parentTable.removeView(currEntry.row);
+                currEntry.setFlags(currEntry.getFlags() & ~WMapEntry.FLAG_UI_USED);
+                currEntry.setFlags(currEntry.getFlags() & ~WMapEntry.FLAG_IS_VISIBLE);
+                scannerHandler.parentTable.removeView(currEntry.getRow());
             }
         ScanService.getScanData().getLock().unlock();
         super.onPause();

@@ -361,7 +361,7 @@ public class ScanService extends Service implements Runnable {
                                 scanData.getLock().lock();
                                 for (j = 0; j < scanData.getWmapList().size(); j++) {
                                     currEntry = scanData.getWmapList().elementAt(j);
-                                    if (currEntry.BSSID.equalsIgnoreCase(bssid)) {
+                                    if (currEntry.getBSSID().equalsIgnoreCase(bssid)) {
                                         currEntry.setPos(lastLat, lastLon);
                                         foundExisting = true;
                                         break;
@@ -388,9 +388,9 @@ public class ScanService extends Service implements Runnable {
                                             (lowerSSID.contains("guest@ms ")) ||   // WLAN network on Hurtigruten ships
                                             (lowerSSID.contains("admin@ms ")) ||   // WLAN network on Hurtigruten ships
                                             (lowerSSID.contains("nsb_interakti"))) // WLAN network in NSB trains
-                                        currEntry.flags |= WMapEntry.FLAG_IS_NOMAP;
-                                    else currEntry.flags |= isFreeHotspot(result);
-                                    if (isFreeHotspot(currEntry.flags))
+                                        currEntry.setFlags(currEntry.getFlags() | WMapEntry.FLAG_IS_NOMAP);
+                                    else currEntry.setFlags(currEntry.getFlags() | isFreeHotspot(result));
+                                    if (isFreeHotspot(currEntry.getFlags()))
                                         scanData.incFreeHotspotWLANs();
                                     scanData.getWmapList().add(currEntry);
                                 }
@@ -401,7 +401,7 @@ public class ScanService extends Service implements Runnable {
                         scanData.getLock().lock();
                         for (j = 0; j < scanData.getWmapList().size(); j++) {
                             currEntry = scanData.getWmapList().elementAt(j);
-                            if ((currEntry.lastUpdate + OWMiniAtAndroid.RECV_TIMEOUT < System.currentTimeMillis()) && ((currEntry.flags & WMapEntry.FLAG_IS_VISIBLE) == 0)) {
+                            if ((currEntry.getLastUpdate() + OWMiniAtAndroid.RECV_TIMEOUT < System.currentTimeMillis()) && ((currEntry.getFlags() & WMapEntry.FLAG_IS_VISIBLE) == 0)) {
                                 scanData.getWmapList().remove(j);
                                 if (currEntry.posIsValid()) {
                                     int padBytes = 0, k;
@@ -418,8 +418,8 @@ public class ScanService extends Service implements Runnable {
                                         out = new DataOutputStream(scanData.getCtx().openFileOutput(OWMiniAtAndroid.WSCAN_FILE, Context.MODE_PRIVATE | Context.MODE_APPEND));
                                         if (padBytes > 0)
                                             for (k = 0; k < padBytes; k++) out.writeByte(0);
-                                        out.write(currEntry.BSSID.getBytes(), 0, 12);
-                                        if ((currEntry.flags & WMapEntry.FLAG_IS_NOMAP) != 0) {
+                                        out.write(currEntry.getBSSID().getBytes(), 0, 12);
+                                        if ((currEntry.getFlags() & WMapEntry.FLAG_IS_NOMAP) != 0) {
                                             out.writeDouble(0.0);
                                             out.writeDouble(0.0);
                                         } else {
@@ -431,7 +431,7 @@ public class ScanService extends Service implements Runnable {
                                         ioe.printStackTrace();
                                     }
 
-                                    if ((currEntry.flags & (WMapEntry.FLAG_IS_FREIFUNK | WMapEntry.FLAG_IS_NOMAP)) == WMapEntry.FLAG_IS_FREIFUNK) {
+                                    if ((currEntry.getFlags() & (WMapEntry.FLAG_IS_FREIFUNK | WMapEntry.FLAG_IS_NOMAP)) == WMapEntry.FLAG_IS_FREIFUNK) {
                                         padBytes = 0;
                                         try {
                                             in = scanData.getCtx().openFileInput(OWMiniAtAndroid.WFREI_FILE);
@@ -445,7 +445,7 @@ public class ScanService extends Service implements Runnable {
                                             out = new DataOutputStream(scanData.getCtx().openFileOutput(OWMiniAtAndroid.WFREI_FILE, Context.MODE_PRIVATE | Context.MODE_APPEND));
                                             if (padBytes > 0)
                                                 for (k = 0; k < padBytes; k++) out.writeByte(0);
-                                            out.write(currEntry.BSSID.getBytes(), 0, 12);
+                                            out.write(currEntry.getBSSID().getBytes(), 0, 12);
                                             out.close();
                                         } catch (IOException ioe) {
                                             ioe.printStackTrace();

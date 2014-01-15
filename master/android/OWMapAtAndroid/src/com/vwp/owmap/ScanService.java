@@ -191,7 +191,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
             text = dateFormat.format(new Date(System.currentTimeMillis())) + "\t";
             if (posValid) text = text + lastLat + "\t" + lastLon + "\t" + m_lastSpeed + "\t";
             else text = text + "-\t-\t-\t";
-            text = text + data.accelX + "\t" + data.accelY + "\t" + data.accelZ + "\t" + data.CoG + "\t" + data.orientY + "\t" + data.orientZ + "\n\n";
+            text = text + data.getAccelX() + "\t" + data.getAccelY() + "\t" + data.getAccelZ() + "\t" + data.CoG + "\t" + data.getOrientY() + "\t" + data.getOrientZ() + "\n\n";
             out.print(text);
             out.close();
         } catch (IOException ioe) {
@@ -362,12 +362,12 @@ public class ScanService extends Service implements Runnable, SensorEventListene
             out.writeInt(ScanService.scanData.getUploadedRank());
             out.writeInt(0); // Open WLANs, no longer used
             out.writeInt(ScanService.scanData.getFreeHotspotWLANs());
-            out.writeFloat(ScanService.scanData.getTelemetryData().corrAccelX);
-            out.writeFloat(ScanService.scanData.getTelemetryData().corrAccelY);
-            out.writeFloat(ScanService.scanData.getTelemetryData().corrAccelZ);
-            out.writeFloat(ScanService.scanData.getTelemetryData().corrCoG);
-            out.writeFloat(ScanService.scanData.getTelemetryData().corrOrientY);
-            out.writeFloat(ScanService.scanData.getTelemetryData().corrOrientZ);
+            out.writeFloat(ScanService.scanData.getTelemetryData().getCorrAccelX());
+            out.writeFloat(ScanService.scanData.getTelemetryData().getCorrAccelY());
+            out.writeFloat(ScanService.scanData.getTelemetryData().getCorrAccelZ());
+            out.writeFloat(ScanService.scanData.getTelemetryData().getCorrCoG());
+            out.writeFloat(ScanService.scanData.getTelemetryData().getCorrOrientY());
+            out.writeFloat(ScanService.scanData.getTelemetryData().getCorrOrientZ());
             out.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -484,7 +484,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                                 scanData.getLock().lock();
                                 for (j = 0; j < scanData.getWmapList().size(); j++) {
                                     currEntry = scanData.getWmapList().elementAt(j);
-                                    if (currEntry.BSSID.equalsIgnoreCase(bssid)) {
+                                    if (currEntry.getBSSID().equalsIgnoreCase(bssid)) {
                                         currEntry.setPos(lastLat, lastLon);
                                         foundExisting = true;
                                         break;
@@ -511,9 +511,9 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                                             (lowerSSID.contains("guest@ms ")) ||   // WLAN network on Hurtigruten ships
                                             (lowerSSID.contains("admin@ms ")) ||   // WLAN network on Hurtigruten ships
                                             (lowerSSID.contains("nsb_interakti"))) // WLAN network in NSB trains
-                                        currEntry.flags |= WMapEntry.FLAG_IS_NOMAP;
-                                    else currEntry.flags |= isFreeHotspot(result);
-                                    if (isFreeHotspot(currEntry.flags))
+                                        currEntry.setFlags(currEntry.getFlags() | WMapEntry.FLAG_IS_NOMAP);
+                                    else currEntry.setFlags(currEntry.getFlags() | isFreeHotspot(result));
+                                    if (isFreeHotspot(currEntry.getFlags()))
                                         scanData.incFreeHotspotWLANs();
                                     scanData.getWmapList().add(currEntry);
                                     if ((scanData.getUploadThres() > 0) && (storedValues > scanData.getUploadThres())) {
@@ -531,7 +531,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                         scanData.getLock().lock();
                         for (j = 0; j < scanData.getWmapList().size(); j++) {
                             currEntry = scanData.getWmapList().elementAt(j);
-                            if ((currEntry.lastUpdate + OWMapAtAndroid.RECV_TIMEOUT < System.currentTimeMillis()) && ((currEntry.flags & WMapEntry.FLAG_IS_VISIBLE) == 0)) {
+                            if ((currEntry.getLastUpdate() + OWMapAtAndroid.RECV_TIMEOUT < System.currentTimeMillis()) && ((currEntry.getFlags() & WMapEntry.FLAG_IS_VISIBLE) == 0)) {
                                 scanData.getWmapList().remove(j);
                                 if (currEntry.posIsValid()) {
                                     int padBytes = 0, k;
@@ -548,8 +548,8 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                                         out = new DataOutputStream(scanData.getCtx().openFileOutput(OWMapAtAndroid.WSCAN_FILE, Context.MODE_PRIVATE | Context.MODE_APPEND));
                                         if (padBytes > 0)
                                             for (k = 0; k < padBytes; k++) out.writeByte(0);
-                                        out.write(currEntry.BSSID.getBytes(), 0, 12);
-                                        if ((currEntry.flags & WMapEntry.FLAG_IS_NOMAP) != 0) {
+                                        out.write(currEntry.getBSSID().getBytes(), 0, 12);
+                                        if ((currEntry.getFlags() & WMapEntry.FLAG_IS_NOMAP) != 0) {
                                             out.writeDouble(0.0);
                                             out.writeDouble(0.0);
                                         } else {
@@ -561,7 +561,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                                         ioe.printStackTrace();
                                     }
 
-                                    if ((currEntry.flags & (WMapEntry.FLAG_IS_FREIFUNK | WMapEntry.FLAG_IS_NOMAP)) == WMapEntry.FLAG_IS_FREIFUNK) {
+                                    if ((currEntry.getFlags() & (WMapEntry.FLAG_IS_FREIFUNK | WMapEntry.FLAG_IS_NOMAP)) == WMapEntry.FLAG_IS_FREIFUNK) {
                                         padBytes = 0;
                                         try {
                                             in = scanData.getCtx().openFileInput(OWMapAtAndroid.WFREI_FILE);
@@ -575,7 +575,7 @@ public class ScanService extends Service implements Runnable, SensorEventListene
                                             out = new DataOutputStream(scanData.getCtx().openFileOutput(OWMapAtAndroid.WFREI_FILE, Context.MODE_PRIVATE | Context.MODE_APPEND));
                                             if (padBytes > 0)
                                                 for (k = 0; k < padBytes; k++) out.writeByte(0);
-                                            out.write(currEntry.BSSID.getBytes(), 0, 12);
+                                            out.write(currEntry.getBSSID().getBytes(), 0, 12);
                                             out.close();
                                         } catch (IOException ioe) {
                                             ioe.printStackTrace();

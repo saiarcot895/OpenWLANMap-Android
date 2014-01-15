@@ -244,14 +244,14 @@ public class LiveMapView extends View implements Runnable {
                 entry = ScanService.getScanData().getWmapList().elementAt(i);
                 cy = (float) ((mapData[currMap].shiftY * 256 + 256.0 * (entry.getLat() - tileLat1) / (tileLat2 - tileLat1)));
                 cx = (float) ((mapData[currMap].shiftX * 256 + 256.0 * (entry.getLon() - tileLon1) / (tileLon2 - tileLon1)));
-                if ((entry.flags & WMapEntry.FLAG_IS_FREIFUNK) != 0) {
+                if ((entry.getFlags() & WMapEntry.FLAG_IS_FREIFUNK) != 0) {
                     c.drawBitmap(freifunkWlanBitmap, cx - 7, cy - 7, null);
-                } else if ((entry.flags & WMapEntry.FLAG_IS_FREEHOTSPOT) != 0) {
+                } else if ((entry.getFlags() & WMapEntry.FLAG_IS_FREEHOTSPOT) != 0) {
                     c.drawBitmap(freeHotspotWlanBitmap, cx - 7, cy - 7, null);
-                } else if ((entry.flags & WMapEntry.FLAG_IS_THECLOUD) != 0) {
+                } else if ((entry.getFlags() & WMapEntry.FLAG_IS_THECLOUD) != 0) {
                     c.drawBitmap(theCloudWlanBitmap, cx - 7, cy - 7, null);
-                } else if ((entry.flags & WMapEntry.FLAG_IS_OPEN) == 0) {
-                    if ((entry.flags & WMapEntry.FLAG_IS_NOMAP) != 0)
+                } else if ((entry.getFlags() & WMapEntry.FLAG_IS_OPEN) == 0) {
+                    if ((entry.getFlags() & WMapEntry.FLAG_IS_NOMAP) != 0)
                         c.drawCircle(cx - 0.5f, cy - 1, 10, wlanColour);
                     c.drawBitmap(wlanBitmap, cx - 7, cy - 7, null);
                 } else {
@@ -271,18 +271,18 @@ public class LiveMapView extends View implements Runnable {
             c.drawRect(10, useHeight + 20, 120, useHeight + 130, instColour);
 
             if (telemetryData != null) {
-                fac = (useHeight * 1.25f) / telemetryData.accelMax;
-                val = fac * telemetryData.accelX;
+                fac = (useHeight * 1.25f) / telemetryData.getAccelMax();
+                val = fac * telemetryData.getAccelX();
                 if (val > cy) val = cy;
                 else if (val < -cy) val = -cy;
                 c.drawRect(12, 10 + cy + val, 39, 10 + cy, instInner);
 
-                val = fac * telemetryData.accelY;
+                val = fac * telemetryData.getAccelY();
                 if (val > cy) val = cy;
                 else if (val < -cy) val = -cy;
                 c.drawRect(52, 10 + cy + val, 79, 10 + cy, instInner);
 
-                val = fac * telemetryData.accelZ;
+                val = fac * telemetryData.getAccelZ();
                 if (val > cy) val = cy;
                 else if (val < -cy) val = -cy;
                 c.drawRect(92, 10 + cy + val, 119, 10 + cy, instInner);
@@ -298,14 +298,14 @@ public class LiveMapView extends View implements Runnable {
                 c.drawCircle(x, y, 51, instInner2);
 
                 fac = 110 / 50.0f;
-                val = telemetryData.orientY * fac;
+                val = telemetryData.getOrientY() * fac;
                 x = (int) (useHeight + 75 - val);
                 if (x > useHeight + 112) x = useHeight + 112;
                 else if (x < useHeight + 28) x = useHeight + 28;
                 c.drawRect(12, x - 7, 119, x + 7, instInner);
 
                 fac = 110 / 50.0f;
-                val = telemetryData.orientZ * fac;
+                val = telemetryData.getOrientZ() * fac;
                 y = (int) (65 + val);
                 if (y < 18) y = 18;
                 else if (y > 112) y = 112;

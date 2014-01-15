@@ -7,15 +7,18 @@ import android.content.*;
 
 
 public class WMapEntry {
-    String BSSID, SSID;
-    double firstLat, firstLon;
+    private String BSSID;
+    private String SSID;
+    private double firstLat;
+    private double firstLon;
     private double lastLat = 0.0, lastLon = 0.0, avgLat = 0.0, avgLon = 0.0;
     private int avgCtr = 0;
-    long lastUpdate;
-    TableRow row;
-    TextView latView = null, lonView = null, addInfoView = null;
-    int listPos = 0;
-    int flags = 0;
+    private long lastUpdate;
+    private TableRow row;
+    private TextView latView = null;
+    private TextView lonView = null;
+    private int listPos = 0;
+    private int flags = 0;
 
     static final int FLAG_UI_USED = 0x0001;
     static final int FLAG_IS_VISIBLE = 0x0002;
@@ -124,10 +127,9 @@ public class WMapEntry {
 
 
     public boolean posIsValid() {
-        if ((lastLat == 0.0) || (lastLon == 0.0)) return false;
-        if (Math.abs(lastLat - firstLat) > 0.0035) return false;
-        if (Math.abs(lastLon - firstLon) > 0.0035) return false;
-        return true;
+        return !((lastLat == 0.0) || (lastLon == 0.0))
+                && Math.abs(lastLat - firstLat) <= 0.0035
+                && Math.abs(lastLon - firstLon) <= 0.0035;
     }
 
     private void addAvgPos(double lat, double lon) {
@@ -144,6 +146,33 @@ public class WMapEntry {
         flags |= FLAG_POS_CHANGED;
     }
 
+    public String getBSSID() {
+        return BSSID;
+    }
+
+    public long getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public TableRow getRow() {
+        return row;
+    }
+
+    public TextView getLatView() {
+        return latView;
+    }
+
+    public TextView getLonView() {
+        return lonView;
+    }
+
+    public int getFlags() {
+        return flags;
+    }
+
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
 
 }
 
