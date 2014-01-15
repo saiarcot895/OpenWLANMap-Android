@@ -303,7 +303,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                     break;
                 case MSG_TELEMETRY:
                     if (showTele) {
-                        liveMapView.setTelemetry((TelemetryData) msg.obj);
+                        liveMapView.setTelemetryData((TelemetryData) msg.obj);
                         liveMapView.invalidate();
                     }
                     break;
@@ -612,7 +612,7 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
         prefsMenuItem = menu.findItem(R.id.freehotspot);
         prefsMenuItem.setEnabled(hasPosLock & ((ScanService.getScanData().getFlags() & FLAG_NO_NET_ACCESS) == 0));
 
-        if (scannerHandler.liveMapView.telemetryData == null) {
+        if (scannerHandler.liveMapView.getTelemetryData() == null) {
             prefsMenuItem = menu.findItem(R.id.calib_tele);
             prefsMenuItem.setEnabled(false);
             prefsMenuItem = menu.findItem(R.id.calib_orient);
@@ -664,18 +664,18 @@ public class OWMapAtAndroid extends Activity implements OnClickListener, OnItemC
                 simpleAlert(text, null, ALERT_OK);
                 break;
             case R.id.calib_tele:
-                if ((scannerHandler.liveMapView != null) && (scannerHandler.liveMapView.telemetryData != null)) {
-                    ScanService.getScanData().getTelemetryData().corrAccel(scannerHandler.liveMapView.telemetryData.getAccelX(),
-                            scannerHandler.liveMapView.telemetryData.getAccelY(),
-                            scannerHandler.liveMapView.telemetryData.getAccelZ());
-                    ScanService.getScanData().getTelemetryData().corrOrient(scannerHandler.liveMapView.telemetryData.getOrientY(),
-                            scannerHandler.liveMapView.telemetryData.getOrientZ());
+                if ((scannerHandler.liveMapView != null) && (scannerHandler.liveMapView.getTelemetryData() != null)) {
+                    ScanService.getScanData().getTelemetryData().corrAccel(scannerHandler.liveMapView.getTelemetryData().getAccelX(),
+                            scannerHandler.liveMapView.getTelemetryData().getAccelY(),
+                            scannerHandler.liveMapView.getTelemetryData().getAccelZ());
+                    ScanService.getScanData().getTelemetryData().corrOrient(scannerHandler.liveMapView.getTelemetryData().getOrientY(),
+                            scannerHandler.liveMapView.getTelemetryData().getOrientZ());
                     ScanService.getScanData().getService().storeConfig();
                 }
                 break;
             case R.id.calib_orient:
-                if ((scannerHandler.liveMapView != null) && (scannerHandler.liveMapView.telemetryData != null)) {
-                    ScanService.getScanData().getTelemetryData().corrCoG(scannerHandler.liveMapView.telemetryData.CoG);
+                if ((scannerHandler.liveMapView != null) && (scannerHandler.liveMapView.getTelemetryData() != null)) {
+                    ScanService.getScanData().getTelemetryData().corrCoG(scannerHandler.liveMapView.getTelemetryData().CoG);
                     ScanService.getScanData().getService().storeConfig();
                 }
                 break;

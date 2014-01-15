@@ -9,14 +9,6 @@ import android.view.*;
 import com.vwp.libwlocate.map.*;
 
 
-class LiveMapData {
-    Bitmap locTile[][];
-    int locTileX[][], locTileY[][];
-    int xOffs, yOffs, shiftX = 0, shiftY = 0;
-    int m_tileX = 0, m_tileY = 0;
-}
-
-
 public class LiveMapView extends View implements Runnable {
     private Bitmap wlanBitmap, openWlanBitmap, freifunkWlanBitmap, freeHotspotWlanBitmap, theCloudWlanBitmap;
     private double m_lat, m_lon;
@@ -27,7 +19,7 @@ public class LiveMapView extends View implements Runnable {
     private int currMap = 0;
     private GeoUtils geoUtils = new GeoUtils(GeoUtils.MODE_GSMAP);
     private Lock lock = new ReentrantLock();
-    TelemetryData telemetryData = null;
+    private TelemetryData telemetryData = null;
     private int useHeight;
 
     public LiveMapView(Context ctx) {
@@ -78,7 +70,7 @@ public class LiveMapView extends View implements Runnable {
     }
 
 
-    void setTelemetry(TelemetryData telemetry) {
+    public void setTelemetryData(TelemetryData telemetry) {
         telemetryData = telemetry;
         this.postInvalidate();
     }
@@ -316,5 +308,16 @@ public class LiveMapView extends View implements Runnable {
             c.drawLine(12, useHeight + 75, 120, useHeight + 75, instColour);
             c.drawLine(65, useHeight + 21, 65, useHeight + 129, instColour);
         }
+    }
+
+    public TelemetryData getTelemetryData() {
+        return telemetryData;
+    }
+
+    private class LiveMapData {
+        Bitmap locTile[][];
+        int locTileX[][], locTileY[][];
+        int xOffs, yOffs, shiftX = 0, shiftY = 0;
+        int m_tileX = 0, m_tileY = 0;
     }
 }
