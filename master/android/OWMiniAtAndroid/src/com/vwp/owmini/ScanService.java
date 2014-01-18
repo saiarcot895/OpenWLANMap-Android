@@ -387,7 +387,8 @@ public class ScanService extends Service implements Runnable {
                                             (lowerSSID.contains("contiki-wifi")) ||   // WLAN network on board of bus
                                             (lowerSSID.contains("guest@ms ")) ||   // WLAN network on Hurtigruten ships
                                             (lowerSSID.contains("admin@ms ")) ||   // WLAN network on Hurtigruten ships
-                                            (lowerSSID.contains("nsb_interakti"))) // WLAN network in NSB trains
+                                            (lowerSSID.contains("nsb_interakti")) || // WLAN network in NSB trains
+                                            (lowerSSID.contains("SouthwestWiFi")))  // WLAN network on Southwest flights
                                         currEntry.setFlags(currEntry.getFlags() | WMapEntry.FLAG_IS_NOMAP);
                                     else currEntry.setFlags(currEntry.getFlags() | isFreeHotspot(result));
                                     if (isFreeHotspot(currEntry.getFlags()))
